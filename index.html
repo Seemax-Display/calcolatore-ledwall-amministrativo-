@@ -1,0 +1,378 @@
+// Versione AMMINISTRATIVA creata da DAVID FAILLA
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calcolatore Ledwall Ufficiale</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+<style>
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Roboto', sans-serif;
+  background: linear-gradient(160deg, #e6f0fa, #ffffff);
+}
+.container {
+  max-width: 1000px;
+  margin: 50px auto;
+  background: #fff;
+  padding: 60px 50px;
+  border-radius: 20px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+}
+h1 { text-align: center; color: #004b8d; font-size: 44px; margin-bottom: 10px; }
+h3 { text-align: center; color: #333; font-weight: normal; font-size: 20px; margin-bottom: 50px; }
+.input-group { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; }
+.input-group div { flex: 1 1 200px; }
+.input-group label { display: block; font-weight: bold; color: #004b8d; margin-bottom: 5px; font-size: 16px; }
+.input-group input { width: 100%; padding: 15px; font-size: 16px; border-radius: 10px; border: 1px solid #ccc; transition: all 0.3s ease; }
+.input-group input:focus { border-color: #00aaff; box-shadow: 0 0 15px rgba(0,170,255,0.4); outline: none; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; margin-top: 50px; }
+.card {
+  background: linear-gradient(145deg, #f0f8ff, #d9f0ff);
+  border-radius: 15px;
+  padding: 25px;
+  box-shadow: 0 12px 35px rgba(0,0,0,0.15);
+  text-align: center;
+  transition: transform 0.4s ease, box-shadow 0.4s ease, border 0.4s ease;
+  min-height: 300px;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+.card.green { background: linear-gradient(145deg, #e0f7ea, #b2f1d6); border-left: 8px solid #00c853; }
+.card.red { background: linear-gradient(145deg, #ffe5e5, #ffcccc); border-left: 8px solid #ff5252; }
+.card.yellow { background: linear-gradient(145deg, #fff9e6, #fff2b2); border-left: 8px solid #ffc107; }
+.card.best { border: 3px solid #00aaff; box-shadow: 0 0 20px rgba(0,170,255,0.4); }
+.card:hover { transform: translateY(-8px) scale(1.03); box-shadow: 0 25px 55px rgba(0,0,0,0.25); }
+.card-icon { font-size: 50px; color: #004b8d; margin-bottom: 15px; }
+.card h2 { color: #004b8d; margin-bottom: 12px; font-size: 26px; }
+.card p { font-size: 16px; margin: 6px 0; }
+.card .price, .card .cabinet, .card .margin { font-weight: bold; font-size: 20px; margin-top: 12px; opacity: 0; transform: translateY(10px); transition: opacity 0.5s ease, transform 0.5s ease; }
+.card.show .price, .card.show .cabinet, .card.show .margin { opacity: 1; transform: translateY(0); }
+.margin-positive { color: #28a745; }
+.margin-negative { color: #dc3545; }
+.btn-request {
+  margin-top: 18px;
+  padding: 12px 22px;
+  font-size: 16px;
+  background: #004b8d;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 75, 141, 0.4);
+}
+.btn-request:hover {
+  background: #00aaff;
+  box-shadow: 0 6px 20px rgba(0, 170, 255, 0.5);
+  transform: translateY(-2px);
+}
+.tooltip { position: relative; cursor: pointer; border-bottom: 1px dotted #004b8d; }
+.tooltip .tooltiptext { visibility: hidden; width: 220px; background-color: #004b8d; color: #fff; text-align: center; border-radius: 6px; padding: 10px; position: absolute; z-index: 1; bottom: 130%; left: 50%; margin-left: -110px; opacity: 0; transition: opacity 0.4s, transform 0.4s; transform: translateY(10px); font-size: 14px; }
+.tooltip:hover .tooltiptext { visibility: visible; opacity: 1; transform: translateY(0); }
+
+/* POPUP FADE IN UP / FADE OUT DOWN */
+.card-popup {
+  position: absolute;
+  top: 10px; left: 10px; right: 10px; bottom: 10px;
+  background: rgba(0,75,141,0.95);
+  color: #fff;
+  padding: 15px;
+  border-radius: 12px;
+  display: block;
+  opacity: 0;
+  transform: translateY(20px);
+  z-index: 10;
+  font-size: 14px;
+  overflow-y: auto;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+.card.show-popup .card-popup {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.alert { text-align:center; margin-top:30px; padding:20px; background:#fff3cd; color:#856404; border-radius:12px; font-size:18px; box-shadow:0 10px 30px rgba(0,0,0,0.15); }
+.alert a { color:#004b8d; font-weight:bold; text-decoration:none;}
+.alert a:hover { text-decoration:underline;}
+#layoutContainer { margin-top:40px; text-align:center; display:flex; flex-direction:column; align-items:center; gap:15px; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Calcolatore Ledwall Ufficiale Seemax</h1>
+  <h3>Calcola e pianifica i tuoi preventivi in maniera dettagliata</h3>
+
+  <div class="input-group">
+    <div>
+      <label for="base">Base (cm):</label>
+      <input type="number" id="base" placeholder="Es. 200">
+    </div>
+    <div>
+      <label for="altezza">Altezza (cm):</label>
+      <input type="number" id="altezza" placeholder="Es. 200">
+    </div>
+  </div>
+
+  <div id="alertContainer"></div>
+  <div class="cards" id="cardsContainer"></div>
+  <div id="layoutContainer"></div>
+</div>
+
+<script>
+const ledwalls = [
+  { nome: "P1.9", cabX: 50, cabY: 100, prezzo: 1000, costo: 560, info: "Ledwall Display P1.9, Misura Cabinet: 0.50x1.00, Qualità Alta da Medie e Lunghe Distanze, utilizzabile SOLO per Installazioni Indoor.", icon: "🖥️" },
+  { nome: "P2.5", cabX: 64, cabY: 64, prezzo: 750, costo: 450, info: "Cabinet LED 0.64x0.64 m, versatile, ottimo per installazioni di medie dimensioni.", icon: "🖥️" },
+  { nome: "P3", cabX: 57, cabY: 57, prezzo: 650, costo: 250, info: "Cabinet LED 0.57x0.57 m, compatto e luminoso, perfetto per display retail.", icon: "🖥️" },
+  { nome: "P3.91", cabX: 50, cabY: 100, prezzo: 550, costo: 280, info: "Cabinet LED 0.50x1.00 m, alta qualità, adatto a installazioni modulari.", icon: "🖥️" },
+  { nome: "P4", cabX: 96, cabY: 96, prezzo: 780, costo: 580, info: "Cabinet LED 0.96x0.96 m, grande formato, ideale per outdoor e fiere.", icon: "🖥️" }
+];
+
+const baseInput = document.getElementById('base');
+const altezzaInput = document.getElementById('altezza');
+const cardsContainer = document.getElementById('cardsContainer');
+const alertContainer = document.getElementById('alertContainer');
+const layoutContainer = document.getElementById('layoutContainer');
+const whatsappNumber = "393294397445";
+
+// Variabile globale per popup
+let currentPopup = null;
+
+function animateValue(element, start, end, duration) {
+  let startTimestamp = null;
+  const step = (timestamp) => {
+    if (!startTimestamp) startTimestamp = timestamp;
+    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+    element.textContent = Math.floor(progress * (end - start) + start);
+    if (progress < 1) window.requestAnimationFrame(step);
+  };
+  window.requestAnimationFrame(step);
+}
+
+function aggiornaLayout(models, rotatedMatchFlag) {
+  layoutContainer.innerHTML = "";
+
+  if (Array.isArray(models) && models.length > 1) {
+      const p19 = models.find(m => m.nome === "P1.9");
+      const p391 = models.find(m => m.nome === "P3.91");
+      if (p19 && p391 && models.length === 2) {
+          const title = "Layout suggerito per P1.9 / P3.91";
+          layoutContainer.innerHTML += `<h3>${title}</h3>`;
+          generaLayout(p19, rotatedMatchFlag);
+      } else {
+          models.forEach(model => {
+              const title = `Layout suggerito per ${model.nome}`;
+              layoutContainer.innerHTML += `<h3>${title}</h3>`;
+              generaLayout(model, rotatedMatchFlag);
+          });
+      }
+  } else {
+      const model = Array.isArray(models) ? models[0] : models;
+      const title = `Layout suggerito per ${model.nome}`;
+      layoutContainer.innerHTML = `<h3>${title}</h3>`;
+      generaLayout(model, rotatedMatchFlag);
+  }
+
+  if (rotatedMatchFlag) {
+    const warning = document.createElement('div');
+    warning.className = 'alert';
+    warning.innerHTML = "⚠️ È possibile ruotare alcuni cabinet rettangolari per ottenere questa misura, ma non è consigliato.";
+    layoutContainer.appendChild(warning);
+  }
+}
+
+function generaLayout(model, rotatedMatchFlag) {
+  const layout = document.createElement('div');
+  layout.style.display = 'grid';
+  layout.style.gridGap = '3px';
+  layout.style.justifyContent = 'center';
+
+  const isRectangle = model.cabX === 50 && model.cabY === 100;
+  const blockWidth = isRectangle && rotatedMatchFlag ? 2*30 : 30;
+  const blockHeight = isRectangle && rotatedMatchFlag ? 30 : (isRectangle ? 2*30 : 30);
+
+  let cols = rotatedMatchFlag && isRectangle ? Math.ceil(baseInput.value / model.cabY) : Math.ceil(baseInput.value / model.cabX);
+  let rows = rotatedMatchFlag && isRectangle ? Math.ceil(altezzaInput.value / model.cabX) : Math.ceil(altezzaInput.value / model.cabY);
+
+  layout.style.gridTemplateColumns = `repeat(${cols}, ${blockWidth}px)`;
+  layout.style.gridTemplateRows = `repeat(${rows}, ${blockHeight}px)`;  
+
+  for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+          const cell = document.createElement('div');
+          cell.style.width = `${blockWidth}px`;
+          cell.style.height = `${blockHeight}px`;
+          cell.style.borderRadius = '4px';
+          cell.style.margin = '1px';
+          cell.style.backgroundColor = '#00aaff';
+          layout.appendChild(cell);
+      }
+  }
+  layoutContainer.appendChild(layout);
+}
+
+function aggiornaCards() {
+  const base = parseFloat(baseInput.value);
+  const altezza = parseFloat(altezzaInput.value);
+  cardsContainer.innerHTML = '';
+  alertContainer.innerHTML = '';
+  layoutContainer.innerHTML = '';
+
+  if(!base || !altezza) return;
+
+  let results = ledwalls.map(model => {
+    const isRectangle = model.cabX === 50 && model.cabY === 100;
+    let perfectMatch = false;
+    let rotatedMatch = false;
+
+    if(isRectangle){
+      perfectMatch = (base % model.cabX === 0 && altezza % model.cabY === 0);
+      rotatedMatch = (!perfectMatch && (base % model.cabY === 0 && altezza % model.cabX === 0));
+    } else {
+      perfectMatch = (base % model.cabX === 0 && altezza % model.cabY === 0);
+      rotatedMatch = false;
+    }
+
+    const nearestCols = Math.round(base / model.cabX);
+    const nearestRows = Math.round(altezza / model.cabY);
+    const nearestBase = nearestCols * model.cabX;
+    const nearestAltezza = nearestRows * model.cabY;
+
+    const colsNeeded = rotatedMatch ? Math.ceil(base / model.cabY) : Math.ceil(base / model.cabX);
+    const rowsNeeded = rotatedMatch ? Math.ceil(altezza / model.cabX) : Math.ceil(altezza / model.cabY);
+    const totalCab = colsNeeded * rowsNeeded;
+    const prezzoTotale = totalCab * model.prezzo;
+    const costoTotale = (model.costo !== undefined) ? totalCab * model.costo : 0;
+    const margine = prezzoTotale - costoTotale;
+
+    const diffX = Math.abs(base - (colsNeeded*(rotatedMatch?model.cabY:model.cabX)));
+    const diffY = Math.abs(altezza - (rowsNeeded*(rotatedMatch?model.cabX:model.cabY)));
+    const diff = diffX + diffY;
+
+    const displayWidth = colsNeeded*(rotatedMatch?model.cabY:model.cabX);
+    const displayHeight = rowsNeeded*(rotatedMatch?model.cabX:model.cabY);
+
+    return {...model, colsNeeded, rowsNeeded, totalCab, prezzoTotale, costoTotale, margine, diff, perfectMatch, rotatedMatch, displayWidth, displayHeight, nearestBase, nearestAltezza};
+  });
+
+  const perfectMatches = results.filter(r => r.perfectMatch);
+  const rotatedMatches = results.filter(r => r.rotatedMatch);
+  const bestMatch = results.reduce((prev, curr) => curr.diff < prev.diff ? curr : prev);
+
+  results.sort((a,b) => {
+    if(a.perfectMatch && !b.perfectMatch) return -1;
+    if(!a.perfectMatch && b.perfectMatch) return 1;
+    return (a.diff + a.prezzoTotale*0.0001) - (b.diff + b.prezzoTotale*0.0001);
+  });
+
+  const bestPriceModel = results.reduce((prev, curr) => curr.prezzoTotale < prev.prezzoTotale ? curr : prev);
+
+  results.forEach(model => {
+    const wrapper = document.createElement('div');
+    wrapper.style.display = 'flex';
+    wrapper.style.flexDirection = 'column';
+    wrapper.style.alignItems = 'center';
+
+    const card = document.createElement('div');
+    if(model.perfectMatch) card.className = 'card green';
+    else if(model.rotatedMatch) card.className = 'card yellow';
+    else card.className = 'card red';
+
+    if(model.nome === bestPriceModel.nome) card.classList.add('best');
+
+    const popup = document.createElement('div');
+    popup.className = 'card-popup';
+    popup.innerHTML = `<strong>${model.nome}</strong><br>${model.info}`;
+    card.appendChild(popup);
+
+    let whatsappLink = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
+      model.perfectMatch || model.rotatedMatch
+      ? `Ti contatto dal calcolatore per il modello ${model.nome} con misura ${base} x ${altezza}. Voglio avere altre informazioni.`
+      : `Ti contatto dal calcolatore per un preventivo personalizzato con modello ${model.nome} e misura ${base} x ${altezza}.`
+    )}`;
+
+    card.innerHTML += `
+      <div class="card-icon">${model.icon}</div>
+      <h2>${model.nome}</h2>
+      <p class="tooltip">Dimensione Cabinet: ${model.cabX} x ${model.cabY} cm
+        <span class="tooltiptext">${model.info}</span>
+      </p>
+      ${model.perfectMatch || model.rotatedMatch ? `
+      <p class="cabinet">Numero Cabinet: <span id="cab${model.nome}">0</span></p>
+      <p class="price">Prezzo Totale: <span id="price${model.nome}">0</span>€</p>
+      <p class="margin ${model.margine >=0 ? 'margin-positive':'margin-negative'}">Margine di Guadagno: <span id="margin${model.nome}">0</span>€</p>
+      ` : `<p>Misura più vicina: ${model.nearestBase} x ${model.nearestAltezza} cm</p>`}
+    `;
+
+    const btnRequest = document.createElement('button');
+    btnRequest.className = 'btn-request';
+    btnRequest.textContent = 'Richiedi Preventivo';
+    btnRequest.onclick = function() { window.open(whatsappLink, '_blank'); };
+
+    card.addEventListener('click', (e) => {
+      if(e.target.classList && e.target.classList.contains('btn-request')) return;
+
+      if (currentPopup && currentPopup !== card){
+        currentPopup.classList.remove('show-popup');
+      }
+
+      if(card.classList.contains('show-popup')){
+        card.classList.remove('show-popup');
+        currentPopup = null;
+      } else {
+        card.classList.add('show-popup');
+        currentPopup = card;
+      }
+    });
+
+    wrapper.appendChild(card);
+    wrapper.appendChild(btnRequest);
+    cardsContainer.appendChild(wrapper);
+
+    if(model.perfectMatch || model.rotatedMatch){
+      setTimeout(()=>card.classList.add('show'),50);
+      animateValue(document.getElementById(`cab${model.nome}`), 0, model.totalCab, 1200);
+      animateValue(document.getElementById(`price${model.nome}`), 0, model.prezzoTotale, 1200);
+      animateValue(document.getElementById(`margin${model.nome}`), 0, model.margine, 1200);
+    }
+  });
+
+  if(rotatedMatches.length > 0){
+    alertContainer.innerHTML = `<div class="alert">
+      ⚠️ È possibile ruotare alcuni cabinet rettangolari per ottenere questa misura, ma non è consigliato.
+    </div>`;
+    aggiornaLayout(rotatedMatches, true);
+  } else if(perfectMatches.length === 0){
+    const rectMatches = results.filter(r => r.cabX===50 && r.cabY===100);
+    let multiRect = [];
+    rectMatches.forEach(r=>{
+        if( (base % r.cabX===0 && altezza % r.cabY===0) || (base % r.cabY===0 && altezza % r.cabX===0)){
+            multiRect.push(r);
+        }
+    });
+    if(multiRect.length>0){
+      alertContainer.innerHTML = `<div class="alert">
+      ⚠️ È possibile ruotare alcuni cabinet rettangolari per ottenere questa misura, ma non è consigliato.
+      </div>`;
+      aggiornaLayout(multiRect, true);
+    } else {
+      alertContainer.innerHTML = `<div class="alert">
+        Per questa misura ti consigliamo un <strong>${bestMatch.nome}</strong> con misure realizzabili ${bestMatch.displayWidth} x ${bestMatch.displayHeight} cm.<br>
+        Puoi richiedere un preventivo personalizzato cliccando <a href="https://wa.me/${whatsappNumber}?text=${encodeURIComponent(`Ti contatto dal calcolatore per un preventivo personalizzato con misura ${base} x ${altezza}.`)}" target="_blank">qui</a>.
+      </div>`;
+      aggiornaLayout([bestMatch], false);
+    }
+  } else {
+    aggiornaLayout(perfectMatches, false);
+  }
+}
+
+baseInput.addEventListener('input', aggiornaCards);
+altezzaInput.addEventListener('input', aggiornaCards);
+</script>
+</body>
+</html>
