@@ -1,3 +1,10 @@
+//Versione Amministrativa 1.0.4 creata da DAVID FAILLA
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calcolatore Ledwall Ufficiale Seemax</title>
 <style>
 body {
   margin: 0;
@@ -22,7 +29,7 @@ h3 { text-align: center; color: #333; font-weight: normal; font-size: 20px; marg
   justify-content: center;
   gap: 30px;
   flex-wrap: wrap;
-  align-items: flex-end; /* allinea tutto in basso */
+  align-items: flex-end;
 }
 .input-group div { flex: 1 1 200px; }
 .input-group label { display: block; font-weight: bold; color: #004b8d; margin-bottom: 5px; font-size: 16px; }
@@ -32,12 +39,12 @@ h3 { text-align: center; color: #333; font-weight: normal; font-size: 20px; marg
 /* CHECKBOX BIFACCIALE */
 label[for="bifacciale"] {
   display: flex;
-  align-items: center; /* centro verticale checkbox e testo */
+  align-items: center;
   gap: 6px;
-  margin-bottom: 0; /* rimuove margine in basso per perfetto allineamento */
+  margin-bottom: 0;
 }
 .input-group div:last-child {
-  flex: 0 0 auto; /* mantiene checkbox compatto senza allungare */
+  flex: 0 0 auto;
 }
 
 /* CARDS */
@@ -63,8 +70,8 @@ label[for="bifacciale"] {
 .card-icon { font-size: 50px; color: #004b8d; margin-bottom: 15px; }
 .card h2 { color: #004b8d; margin-bottom: 12px; font-size: 26px; }
 .card p { font-size: 16px; margin: 6px 0; }
-.card .price, .card .cabinet, .card .margin { font-weight: bold; font-size: 20px; margin-top: 12px; opacity: 0; transform: translateY(10px); transition: opacity 0.5s ease, transform 0.5s ease; }
-.card.show .price, .card.show .cabinet, .card.show .margin { opacity: 1; transform: translateY(0); }
+.card .price, .card .priceClient, .card .cabinet, .card .margin, .card .marginClient { font-weight: bold; font-size: 20px; margin-top: 12px; opacity: 0; transform: translateY(10px); transition: opacity 0.5s ease, transform 0.5s ease; }
+.card.show .price, .card.show .priceClient, .card.show .cabinet, .card.show .margin, .card.show .marginClient { opacity: 1; transform: translateY(0); }
 .margin-positive { color: #28a745; }
 .margin-negative { color: #dc3545; }
 .btn-request {
@@ -142,11 +149,11 @@ label[for="bifacciale"] {
 
 <script>
 const ledwalls = [
-  { nome: "P1.9", cabX: 50, cabY: 100, prezzo: 1000, costo: 560, info: "Ledwall Display P1.9 | Misura Cabinet: 0.50x1.00 | Qualità Elevata da Medie e Lunghe Distanze. Ottimo a Distanze Ravvicinate. | Utilizzabile SOLO per Installazioni Indoor. | COSTO DI ACQUISTO DALLA CINA: 560 Euro (Incluso del 30% dei costi di Spedizione).", icon: "🖥️" },
-  { nome: "P2.5", cabX: 64, cabY: 64, prezzo: 750, costo: 450, info: "Ledwall Display P2.5 | Misura Cabinet: 0.64x0.64 | Qualità Eccellente da Medie e Lunghe Distanze. Buono a Distanze Ravvicinate. | Utilizzabile per Installazioni Indoor e Outdoor. | Adatto per Installazioni su Vetrina o Stile TOTEM. | COSTO DI ACQUISTO DALLA CINA: 450 Euro (Incluso del 30% dei costi di Spedizione).", icon: "🖥️" },
-  { nome: "P3", cabX: 57, cabY: 57, prezzo: 650, costo: 250, info: "Ledwall Display P3 | Misura Cabinet: 0.57x0.57 | Qualità Eccellente da Medie e Lunghe Distanze. | Utilizzabile per Installazioni Indoor e Outdoor. | Adatto per Installazioni su Parete e a Bandiera. | COSTO DI ACQUISTO DALLA CINA: 250 Euro (Incluso del 30% dei costi di Spedizione).", icon: "🖥️" },
-  { nome: "P3.91", cabX: 50, cabY: 100, prezzo: 550, costo: 280, info: "Ledwall Display P3.91 | Misura Cabinet: 0.50x1.00 | Qualità Ottima da Medie e Lunghe Distanze. | Utilizzabile per Installazioni Indoor e Outdoor. | Adatto per Installazioni su Parete e a Bandiera. | COSTO DI ACQUISTO DALLA CINA: 280 Euro (Incluso del 30% dei costi di Spedizione).", icon: "🖥️" },
-  { nome: "P4", cabX: 96, cabY: 96, prezzo: 780, costo: 580, info: "Ledwall Display P4 | Misura Cabinet: 0.96x0.96 | Qualità Buona da Medie e Lunghe Distanze. | Utilizzabile prettamente per Installazioni Outdoor. | Adatto per Installazioni su Parete e a Bandiera. | COSTO DI ACQUISTO DALLA CINA: 580 Euro (Incluso del 30% dei costi di Spedizione).", icon: "🖥️" }
+  { nome: "P1.9", cabX: 50, cabY: 100, prezzo: 1000, prezzoCliente: 1200, costo: 560, info: "Ledwall Display P1.9 | Misura Cabinet: 0.50x1.00 | Qualità Elevata da Medie e Lunghe Distanze. Ottimo a Distanze Ravvicinate. | Utilizzabile SOLO per Installazioni Indoor. | COSTO DI ACQUISTO DALLA CINA: 560 Euro (Incluso del 30% dei costi di Spedizione).", icon: "🖥️" },
+  { nome: "P2.5", cabX: 64, cabY: 64, prezzo: 750, prezzoCliente: 900, costo: 450, info: "Ledwall Display P2.5 | Misura Cabinet: 0.64x0.64 | Qualità Eccellente da Medie e Lunghe Distanze. Buono a Distanze Ravvicinate. | Utilizzabile per Installazioni Indoor e Outdoor. | Adatto per Installazioni su Vetrina o Stile TOTEM. | COSTO DI ACQUISTO DALLA CINA: 450 Euro (Incluso del 30% dei costi di Spedizione).", icon: "🖥️" },
+  { nome: "P3", cabX: 57, cabY: 57, prezzo: 650, prezzoCliente: 850, costo: 250, info: "Ledwall Display P3 | Misura Cabinet: 0.57x0.57 | Qualità Eccellente da Medie e Lunghe Distanze. | Utilizzabile per Installazioni Indoor e Outdoor. | Adatto per Installazioni su Parete e a Bandiera. | COSTO DI ACQUISTO DALLA CINA: 250 Euro (Incluso del 30% dei costi di Spedizione).", icon: "🖥️" },
+  { nome: "P3.91", cabX: 50, cabY: 100, prezzo: 550, prezzoCliente: 750, costo: 280, info: "Ledwall Display P3.91 | Misura Cabinet: 0.50x1.00 | Qualità Ottima da Medie e Lunghe Distanze. | Utilizzabile per Installazioni Indoor e Outdoor. | Adatto per Installazioni su Parete e a Bandiera. | COSTO DI ACQUISTO DALLA CINA: 280 Euro (Incluso del 30% dei costi di Spedizione).", icon: "🖥️" },
+  { nome: "P4", cabX: 96, cabY: 96, prezzo: 780, prezzoCliente: 1000, costo: 580, info: "Ledwall Display P4 | Misura Cabinet: 0.96x0.96 | Qualità Buona da Medie e Lunghe Distanze. | Utilizzabile prettamente per Installazioni Outdoor. | Adatto per Installazioni su Parete e a Bandiera. | COSTO DI ACQUISTO DALLA CINA: 580 Euro (Incluso del 30% dei costi di Spedizione).", icon: "🖥️" }
 ];
 
 const baseInput = document.getElementById('base');
@@ -268,9 +275,12 @@ function aggiornaCards() {
     const colsNeeded = rotatedMatch ? Math.ceil(base / model.cabY) : Math.ceil(base / model.cabX);
     const rowsNeeded = rotatedMatch ? Math.ceil(altezza / model.cabX) : Math.ceil(altezza / model.cabY);
     const totalCab = colsNeeded * rowsNeeded * (isBifacciale ? 2 : 1);
+
     const prezzoTotale = totalCab * model.prezzo;
+    const prezzoClienteTotale = totalCab * model.prezzoCliente;
     const costoTotale = (model.costo !== undefined) ? totalCab * model.costo : 0;
     const margine = prezzoTotale - costoTotale;
+    const margineCliente = prezzoClienteTotale - costoTotale;
 
     const diffX = Math.abs(base - (colsNeeded*(rotatedMatch?model.cabY:model.cabX)));
     const diffY = Math.abs(altezza - (rowsNeeded*(rotatedMatch?model.cabX:model.cabY)));
@@ -279,7 +289,7 @@ function aggiornaCards() {
     const displayWidth = colsNeeded*(rotatedMatch?model.cabY:model.cabX);
     const displayHeight = rowsNeeded*(rotatedMatch?model.cabX:model.cabY);
 
-    return {...model, colsNeeded, rowsNeeded, totalCab, prezzoTotale, costoTotale, margine, diff, perfectMatch, rotatedMatch, displayWidth, displayHeight, nearestBase, nearestAltezza};
+    return {...model, colsNeeded, rowsNeeded, totalCab, prezzoTotale, prezzoClienteTotale, costoTotale, margine, margineCliente, diff, perfectMatch, rotatedMatch, displayWidth, displayHeight, nearestBase, nearestAltezza};
   });
 
   const perfectMatches = results.filter(r => r.perfectMatch);
@@ -327,8 +337,10 @@ function aggiornaCards() {
       </p>
       ${model.perfectMatch || model.rotatedMatch ? `
       <p class="cabinet">Numero Cabinet: <span id="cab${model.nome}">0</span></p>
-      <p class="price">Prezzo Totale: <span id="price${model.nome}">0</span>€</p>
-      <p class="margin ${model.margine >=0 ? 'margin-positive':'margin-negative'}">Margine di Guadagno: <span id="margin${model.nome}">0</span>€</p>
+      <p class="price">Prezzo Agente: <span id="price${model.nome}">0</span>€</p>
+      <p class="priceClient">Prezzo Cliente: <span id="priceClient${model.nome}">0</span>€</p>
+      <p class="margin ${model.margine >=0 ? 'margin-positive':'margin-negative'}">Margine su Agente: <span id="margin${model.nome}">0</span>€</p>
+      <p class="marginClient ${model.margineCliente >=0 ? 'margin-positive':'margin-negative'}">Margine su Cliente: <span id="marginClient${model.nome}">0</span>€</p>
       ` : `<p>Misura più vicina: ${model.nearestBase} x ${model.nearestAltezza} cm</p>`}
     `;
 
@@ -361,7 +373,9 @@ function aggiornaCards() {
       setTimeout(()=>card.classList.add('show'),50);
       animateValue(document.getElementById(`cab${model.nome}`), 0, model.totalCab, 1200);
       animateValue(document.getElementById(`price${model.nome}`), 0, model.prezzoTotale, 1200);
+      animateValue(document.getElementById(`priceClient${model.nome}`), 0, model.prezzoClienteTotale, 1200);
       animateValue(document.getElementById(`margin${model.nome}`), 0, model.margine, 1200);
+      animateValue(document.getElementById(`marginClient${model.nome}`), 0, model.margineCliente, 1200);
     }
   });
 
