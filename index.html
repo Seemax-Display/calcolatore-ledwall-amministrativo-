@@ -1,10 +1,10 @@
-<!-- Versione AMMINISTRATIVA 1.3.1 – con Tipo Installazione, Provincia installazione, Margine installazione e Margine km -->
+<!-- Versione AMMINISTRATIVA 1.3.2 – Fix: Provincia/Installazione sommate in Prezzo Agente/Cliente -->
 <!DOCTYPE html>
 <html lang="it">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Calcolatore Ledwall Ufficiale Seemax – Admin 1.3.1</title>
+<title>Calcolatore Ledwall Ufficiale Seemax – Admin 1.3.2</title>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
 <style>
 /* BODY & CONTAINER */
@@ -110,7 +110,7 @@ h3 { text-align:center; color:#b0cfff; font-weight:normal; font-size:20px; margi
     </div>
   </div>
 
-  <!-- NUOVO: Tipo Installazione -->
+  <!-- Tipo Installazione -->
   <div class="input-group" aria-label="Tipo Installazione">
     <div style="flex:1 1 100%">
       <label for="installazione">Installazione</label>
@@ -124,7 +124,7 @@ h3 { text-align:center; color:#b0cfff; font-weight:normal; font-size:20px; margi
     </div>
   </div>
   
-  <!-- NUOVO: Provincia Installazione con pill -->
+  <!-- Provincia Installazione con pill -->
   <div class="input-group" aria-label="Provincia Installazione">
     <div style="flex:1 1 100%">
       <label for="provincia">Provincia installazione</label>
@@ -188,9 +188,9 @@ const INSTALL_COSTS = [
   { th:7.0,  parete:1200, bandiera:1100, palo:1100, vetrina:900 },
   { th:8.0,  parete:1300, bandiera:1200, palo:1200, vetrina:1000 },
   { th:9.0,  parete:1400, bandiera:1300, palo:1300, vetrina:1100 },
-  { th:15.0, parete:1550, bandiera:1450, palo:1450, vetrina:1200 }, // 10–<15
-  { th:20.0, parete:1800, bandiera:1650, palo:1650, vetrina:1500 }, // 15–<20
-  { th:1e9,  parete:2000, bandiera:1950, palo:1950, vetrina:1800 }  // ≥20
+  { th:15.0, parete:1550, bandiera:1450, palo:1450, vetrina:1200 },
+  { th:20.0, parete:1800, bandiera:1650, palo:1650, vetrina:1500 },
+  { th:1e9,  parete:2000, bandiera:1950, palo:1950, vetrina:1800 }
 ];
 function installCost(areaMq, tipo){
   if(tipo==='personalizza') return 0;
@@ -198,7 +198,7 @@ function installCost(areaMq, tipo){
   switch(tipo){ case 'parete': return rec.parete; case 'bandiera': return rec.bandiera; case 'palo': return rec.palo; case 'vetrina': return rec.vetrina; default: return 0; }
 }
 
-// Provincia – km da Catania (approssimativi) e costo/km
+// Provincia – km da Catania e costo/km
 const PROVINCE_KM = { Catania:0, Siracusa:51, Enna:71, Ragusa:72, Messina:87, Caltanissetta:90, Agrigento:135, Palermo:166, Trapani:231 };
 const COSTO_KM = 2.0;
 
@@ -255,6 +255,9 @@ function aggiornaCards(){
   cardsContainer.innerHTML=''; alertContainer.innerHTML=''; layoutContainer.innerHTML=''; setProvinciaPill();
   if(!base || !altezza) return;
 
+  const kmSelezionati = PROVINCE_KM[provinciaSelect.value] || 0; // <-- km correnti
+  const extraKm = kmSelezionati * COSTO_KM;                       // <-- € km
+
   let results = ledwalls.map(model=>{
     const isRect = model.cabX===50 && model.cabY===100;
     let perfect=false, rotated=false;
@@ -265,28 +268,38 @@ function aggiornaCards(){
     const rows = rotated? Math.ceil(altezza/model.cabX) : Math.ceil(altezza/model.cabY);
 
     let totalCab = cols*rows;
-    let prezzoClienteTot = totalCab * model.prezzoCliente;
-    let prezzoAgenteTot  = totalCab * model.prezzoAgente;
-    let margineCliente   = prezzoClienteTot - (totalCab * model.prezzoCina);
-    let margineAgente    = prezzoAgenteTot  - (totalCab * model.prezzoCina);
+    let prezzoClienteBase = totalCab * model.prezzoCliente; // solo display
+    let prezzoAgenteBase  = totalCab * model.prezzoAgente;  // solo display
+    let margineCliente    = prezzoClienteBase - (totalCab * model.prezzoCina);
+    let margineAgente     = prezzoAgenteBase  - (totalCab * model.prezzoCina);
 
-    if(bif){ totalCab*=2; prezzoClienteTot*=2; prezzoAgenteTot*=2; margineCliente*=2; margineAgente*=2; }
-
-    const nearestCols=Math.round(base/model.cabX); const nearestRows=Math.round(altezza/model.cabY);
-    const nearestBase=nearestCols*model.cabX; const nearestAltezza=nearestRows*model.cabY;
+    if(bif){ totalCab*=2; prezzoClienteBase*=2; prezzoAgenteBase*=2; margineCliente*=2; margineAgente*=2; }
 
     const displayWidth = cols*(rotated?model.cabY:model.cabX);
     const displayHeight= rows*(rotated?model.cabX:model.cabY);
 
-    // *** NUOVO: calcolo installazione e km (mostrati come "Margine installazione" e "Margine km")
     const areaMq = (displayWidth/100) * (displayHeight/100);
-    const extraInstall = installCost(areaMq, tipoInst);
-    const km = PROVINCE_KM[provinciaSelect.value] || 0;
-    const extraKm = km * COSTO_KM;
+    const extraInstall = installCost(areaMq, tipoInst); // € installazione
+
+    // *** Totali mostrati in card = Display + Installazione + Km
+    const prezzoClienteTotale = prezzoClienteBase + extraInstall + extraKm;
+    const prezzoAgenteTotale  = prezzoAgenteBase  + extraInstall + extraKm;
 
     const diffX=Math.abs(base - displayWidth); const diffY=Math.abs(altezza - displayHeight); const diff=diffX+diffY;
 
-    return { ...model, colsNeeded:cols, rowsNeeded:rows, totalCab, prezzoClienteTotale:prezzoClienteTot, prezzoAgenteTotale:prezzoAgenteTot, margineCliente, margineAgente, diff, perfectMatch:perfect, rotatedMatch:rotated, displayWidth, displayHeight, nearestBase, nearestAltezza, bifacciale:bif, prezzoTotale:prezzoClienteTot, margineInstallazione:extraInstall, margineKm:extraKm };
+    return { ...model,
+      colsNeeded:cols, rowsNeeded:rows, totalCab,
+      prezzoClienteTotale, prezzoAgenteTotale, // <-- ora includono provincia e installazione
+      margineCliente, margineAgente,           // margini solo display (come richiesto)
+      margineInstallazione: extraInstall,
+      margineKm: extraKm,
+      diff, perfectMatch:perfect, rotatedMatch:rotated,
+      displayWidth, displayHeight,
+      nearestBase: Math.round(base/model.cabX)*model.cabX,
+      nearestAltezza: Math.round(altezza/model.cabY)*model.cabY,
+      bifacciale:bif,
+      prezzoTotale: prezzoClienteTotale        // per ordinamento/tie-break
+    };
   });
 
   const perfectMatches = results.filter(r=>r.perfectMatch);
@@ -331,17 +344,17 @@ function aggiornaCards(){
 
     if(model.perfectMatch || model.rotatedMatch){ setTimeout(()=>{ card.classList.add('show');
       animateValue(document.getElementById(`cab${model.nome}`),0,model.totalCab,1200);
-      animateValue(document.getElementById(`priceAgent${model.nome}`),0,model.prezzoAgenteTotale,1200);
-      animateValue(document.getElementById(`priceClient${model.nome}`),0,model.prezzoClienteTotale,1200);
-      animateValue(document.getElementById(`marginAgent${model.nome}`),0,model.margineAgente,1200);
-      animateValue(document.getElementById(`marginClient${model.nome}`),0,model.margineCliente,1200);
-      animateValue(document.getElementById(`marginInst${model.nome}`),0,model.margineInstallazione,1200);
-      animateValue(document.getElementById(`marginKm${model.nome}`),0,model.margineKm,1200);
+      animateValue(document.getElementById(`priceAgent${model.nome}`),0,Math.round(model.prezzoAgenteTotale),1200);
+      animateValue(document.getElementById(`priceClient${model.nome}`),0,Math.round(model.prezzoClienteTotale),1200);
+      animateValue(document.getElementById(`marginAgent${model.nome}`),0,Math.round(model.margineAgente),1200);
+      animateValue(document.getElementById(`marginClient${model.nome}`),0,Math.round(model.margineCliente),1200);
+      animateValue(document.getElementById(`marginInst${model.nome}`),0,Math.round(model.margineInstallazione),1200);
+      animateValue(document.getElementById(`marginKm${model.nome}`),0,Math.round(model.margineKm),1200);
     },50); }
   });
 
   if(rotatedMatches.length>0){ alertContainer.innerHTML=`<div class="alert">⚠️ È possibile ruotare alcuni cabinet rettangolari per ottenere questa misura, ma non è consigliato.</div>`; aggiornaLayout(rotatedMatches,true); }
-  else if(perfectMatches.length===0){ alertContainer.innerHTML = `<div class="alert">Per questa misura ti consigliamo un <strong>${bestMatch.nome}</strong> con misure realizzabili ${bestMatch.displayWidth} x ${bestMatch.displayHeight} cm.<br>Puoi richiedere un preventivo personalizzato cliccando <a href="https://wa.me/${whatsappNumber}?text=${encodeURIComponent(`Ti contatto dal calcolatore ADMIN per un preventivo personalizzato con misura ${base} x ${altezza}${(bif?' (Bifacciale)':'')}.`)}" target="_blank">qui</a>.</div>`; aggiornaLayout([bestMatch],false); }
+  else if(perfectMatches.length===0){ alertContainer.innerHTML = `<div class="alert">Per questa misura ti consigliamo un <strong>${bestMatch.nome}</strong> con misure realizzabili ${bestMatch.displayWidth} x ${bestMatch.displayHeight} cm.<br>Puoi richiedere un preventivo personalizzato cliccando <a href="https://wa.me/${whatsappNumber}?text=${encodeURIComponent(`Ti contatto dal calcolatore ADMIN per un preventivo personalizzato con misura ${base} x ${altezza}${(bif? ' (Bifacciale)':'')}.`)}" target="_blank">qui</a>.</div>`; aggiornaLayout([bestMatch],false); }
   else { aggiornaLayout(perfectMatches,false); }
 }
 
