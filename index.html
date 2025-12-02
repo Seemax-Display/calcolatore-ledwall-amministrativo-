@@ -1,372 +1,1427 @@
-<!-- Versione AMMINISTRATIVA 1.3.2 – Fix: Provincia/Installazione sommate in Prezzo Agente/Cliente -->
+<!-- Calcolatore Ledwall Ufficiale Seemax – Admin 1.3.2 – Minimal + Dark switch -->
 <!DOCTYPE html>
 <html lang="it">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Calcolatore Ledwall Ufficiale Seemax – Admin 1.3.2</title>
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
-<style>
-/* BODY & CONTAINER */
-body { margin:0; padding:0; font-family:'Roboto',sans-serif; background:linear-gradient(160deg,#0a1b2a,#112f4a); color:#e0e0e0; overflow-x:hidden; }
-.container { max-width:1000px; margin:50px auto; background:rgba(20,30,50,0.9); padding:60px 50px; border-radius:25px; box-shadow:0 20px 50px rgba(0,0,0,0.6); }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calcolatore Ledwall Ufficiale Seemax – Admin 1.3.2</title>
 
-/* HEADER */
-h1 { text-align:center; color:#00c6ff; font-size:44px; margin-bottom:10px; text-shadow:0 0 8px #00c6ff; }
-h3 { text-align:center; color:#b0cfff; font-weight:normal; font-size:20px; margin-bottom:30px; }
+  <!-- Font minimal/pro -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
-/* INPUT */
-.input-group { display:flex; justify-content:center; gap:30px; flex-wrap:wrap; }
-.input-group div { flex:1 1 200px; }
-.input-group label { display:block; font-weight:bold; color:#00aaff; margin-bottom:5px; font-size:16px; }
-.input-group input, .input-group select { width:100%; padding:15px; font-size:16px; border-radius:12px; border:1px solid #004b8d; background:rgba(0,75,141,0.1); color:#fff; transition:all 0.3s ease; }
-.input-group input:focus, .input-group select:focus { border-color:#00c6ff; box-shadow:0 0 20px rgba(0,198,255,0.5); outline:none; }
+  <style>
+    /* RESET */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-/* CARDS */
-.cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:30px; margin-top:30px; }
-.card { position:relative; background:linear-gradient(145deg,#112f4a,#0a1b2a); border-radius:20px; padding:25px; box-shadow:0 12px 35px rgba(0,0,0,0.5), 0 0 10px rgba(0,198,255,0.2) inset; text-align:center; transition:transform 0.5s ease, box-shadow 0.5s ease; cursor:pointer; overflow:hidden; }
-.card::before { content:""; position:absolute; inset:0; background-image:radial-gradient(circle, rgba(255,255,255,0.03) 1px, transparent 1px); background-size:12px 12px; border-radius:20px; pointer-events:none; }
-.card.green { border-left:6px solid #00ff99; }
-.card.red { border-left:6px solid #ff5252; }
-.card.yellow { border-left:6px solid #ffc107; }
-.card.best { border:3px solid #00c6ff; box-shadow:0 0 25px #00c6ff; }
-.card:hover { transform:translateY(-12px) scale(1.05) rotateZ(1deg); box-shadow:0 25px 55px rgba(0,0,0,0.6), 0 0 25px #00c6ff inset; }
-.card-icon { font-size:50px; color:#00c6ff; margin-bottom:15px; text-shadow:0 0 10px #00c6ff; transition:transform 0.3s ease; }
-.card:hover .card-icon { transform:scale(1.2) rotate(-5deg); }
-.card h2 { color:#00c6ff; margin-bottom:12px; font-size:26px; text-shadow:0 0 6px rgba(0,198,255,0.7); }
-.card p { font-size:16px; margin:6px 0; }
-/* PRICE, PRICECLIENT, CABINET - gradient blu */
-.card .price, .card .priceClient, .card .cabinet { font-weight:bold; font-size:20px; background:linear-gradient(90deg,#00ffcc,#00aaff); -webkit-background-clip:text; -webkit-text-fill-color:transparent; text-shadow:0 2px 6px rgba(0,0,0,0.4); }
-/* MARGINI verdi */
-.card .margin, .card .marginClient, .card .marginInstall, .card .marginKm { font-weight:bold; font-size:20px; color:#04fc00; text-shadow:0 2px 6px rgba(0,0,0,0.4); background:none; -webkit-background-clip:unset; -webkit-text-fill-color:unset; }
-.card.show .price, .card.show .cabinet { opacity:1; transform:translateY(0); }
-.card .bifacciale-label { color:#ff5252; font-weight:bold; margin-top:10px; font-size:18px; }
+    :root {
+      /* Minimal (default) */
+      --bg-page: radial-gradient(circle at top, #e5edff 0, #f3f4f6 55%);
+      --bg-surface: #ffffff;
+      --bg-subtle: #f9fafb;
+      --border-subtle: #e5e7eb;
+      --border-strong: #d1d5db;
+      --text-primary: #111827;
+      --text-secondary: #6b7280;
+      --text-muted: #9ca3af;
+      --accent: #2563eb;
+      --accent-soft: rgba(37, 99, 235, 0.08);
+      --accent-strong: #1d4ed8;
+      --danger: #ef4444;
+      --success: #16a34a;
+      --warning: #f59e0b;
 
-/* BUTTON */
-.btn-request { margin-top:18px; padding:12px 22px; font-size:16px; background:#004b8d; color:#fff; border:none; border-radius:12px; cursor:pointer; transition:all 0.3s ease; box-shadow:0 4px 15px rgba(0,75,141,0.4); }
-.btn-request:hover { background:#00c6ff; box-shadow:0 0 25px #00c6ff, 0 6px 20px rgba(0,198,255,0.5); transform:translateY(-3px) scale(1.05); }
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --shadow-soft: 0 16px 40px rgba(15, 23, 42, 0.12);
+      --shadow-subtle: 0 1px 3px rgba(15, 23, 42, 0.08);
+    }
 
-/* TOOLTIP */
-.tooltip { position:relative; cursor:pointer; border-bottom:1px dotted #00c6ff; }
-.tooltip .tooltiptext { visibility:hidden; width:240px; background-color:#00c6ff; color:#000; text-align:center; border-radius:8px; padding:10px; position:absolute; z-index:1; bottom:130%; left:50%; margin-left:-120px; opacity:0; transition:opacity 0.4s, transform 0.4s; transform:translateY(10px); font-size:14px; }
-.tooltip:hover .tooltiptext { visibility:visible; opacity:1; transform:translateY(0); }
+    /* Override variabili per tema dark */
+    body.theme-dark {
+      --bg-page: radial-gradient(circle at top, #020617 0, #020617 60%);
+      --bg-surface: #020617;
+      --bg-subtle: #020617;
+      --border-subtle: #1e293b;
+      --border-strong: #374151;
+      --text-primary: #e5e7eb;
+      --text-secondary: #cbd5f5;
+      --text-muted: #9ca3af;
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.16);
+      --accent-strong: #38bdf8;
+      --danger: #f97373;
+      --success: #22c55e;
+      --warning: #facc15;
 
-/* POPUP */
-.card-popup { position:absolute; top:10px; left:10px; right:10px; bottom:10px; background:rgba(0,50,90,0.95); color:#fff; padding:15px; border-radius:15px; display:block; opacity:0; transform:translateY(20px); z-index:10; font-size:14px; overflow-y:auto; transition:opacity 0.4s ease, transform 0.4s ease; }
-.card.show-popup .card-popup { opacity:1; transform:translateY(0); }
+      --shadow-soft: 0 22px 60px rgba(0, 0, 0, 0.9);
+      --shadow-subtle: 0 1px 4px rgba(15, 23, 42, 0.85);
+    }
 
-/* ALERT */
-.alert { text-align:center; margin-top:30px; padding:20px; background:#221111; color:#ff5252; border-radius:15px; font-size:18px; box-shadow:0 10px 30px rgba(0,0,0,0.5); }
-.alert a { color:#00c6ff; font-weight:bold; text-decoration:none; }
-.alert a:hover { text-decoration:underline; }
+    body {
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-page);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 32px 16px;
+      position: relative;
+      overflow-x: hidden;
+      transition: background 0.25s ease, color 0.25s ease;
+    }
 
-/* LAYOUT */
-#layoutContainer { margin-top:40px; text-align:center; display:flex; flex-direction:column; align-items:center; gap:15px; }
-#layoutContainer h3 { color:#00c6ff; text-shadow:0 0 10px #00c6ff; margin-bottom:15px; }
+    /* PARTICLE BACKGROUND – molto discreto dietro */
+    #particle-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.18;
+      mix-blend-mode: multiply;
+      transition: opacity 0.25s ease, mix-blend-mode 0.25s ease;
+    }
 
-/* SPLASH */
-#splash{ position:fixed; inset:0; background:#0a1b2a; display:flex; justify-content:center; align-items:center; flex-direction:column; z-index:9999; opacity:1; transition:opacity 0.8s ease; }
-#splash.hidden{ opacity:0; pointer-events:none; }
-#splash-logo{ font-size:60px; color:#00c6ff; text-shadow:0 0 15px #00c6ff; transform:scale(0.8); animation:logoReveal 1s forwards; margin-bottom:20px; }
-@keyframes logoReveal{ 0%{opacity:0; transform:scale(0.5);} 100%{opacity:1; transform:scale(1);} }
-#loading-bar{ width:300px; height:8px; border-radius:4px; background:rgba(255,255,255,0.2); overflow:hidden; }
-#loading-fill{ width:0%; height:100%; background:#00c6ff; transition:width 0.3s ease; }
+    body.theme-dark #particle-bg {
+      opacity: 0.5;
+      mix-blend-mode: normal;
+    }
 
-/* PARTICLE BG */
-#particle-bg{ position:fixed; inset:0; z-index:0; pointer-events:none; }
+    /* SHELL APPLICAZIONE */
+    .app-frame {
+      width: 100%;
+      max-width: 1200px;
+      position: relative;
+      z-index: 1;
+    }
 
-/* Select temi scuri */
-#installazione, #provincia { color:#fff; background-color:rgba(0,75,141,0.1); border-color:#004b8d; }
-#installazione:focus, #provincia:focus { outline:2px solid #00c6ff; box-shadow:0 0 12px rgba(0,198,255,0.35); }
-#installazione option, #provincia option { background:#0f1f33; color:#fff; }
-#installazione option:checked, #provincia option:checked { background:#00c6ff; color:#00111c; }
-#installazione option:hover, #provincia option:hover { background:#123b5a; color:#fff; }
+    .container {
+      background: var(--bg-surface);
+      border-radius: 20px;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      padding: 20px 22px 22px;
+      transition: background 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    }
 
-/* Provincia pill (verde->rosso) */
-.provincia-row{ display:flex; align-items:center; gap:12px; }
-.provincia-pill{ padding:8px 12px; border-radius:999px; font-weight:700; font-size:14px; color:#fff; background:#00a651; min-width:120px; text-align:right; margin-left:auto; box-shadow:0 6px 18px rgba(0,0,0,0.2); }
-</style>
+    body.theme-dark .container {
+      border-color: #1f2937;
+    }
+
+    /* HEADER */
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .brand-area {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: radial-gradient(circle at 30% 20%, #93c5fd, #1d4ed8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 18px;
+      color: #ffffff;
+      box-shadow: 0 8px 18px rgba(37, 99, 235, 0.35);
+      transition: box-shadow 0.25s ease, background 0.25s ease;
+    }
+
+    body.theme-dark .brand-logo {
+      background: radial-gradient(circle at 30% 20%, #1d4ed8, #020617);
+      box-shadow: 0 12px 26px rgba(37, 99, 235, 0.8);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+
+    .brand-text span:first-child {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+    }
+
+    .brand-text span:last-child {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .heading-area {
+      flex: 1;
+      text-align: center;
+    }
+
+    .heading-area h1 {
+      font-size: 18px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .heading-area p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+
+    .badge-area {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 6px;
+      min-width: 160px;
+    }
+
+    .pill {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.13em;
+      border-radius: 999px;
+      padding: 4px 10px;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      background: var(--bg-subtle);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .pill-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--success);
+    }
+
+    .tag {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: var(--bg-subtle);
+      color: var(--text-muted);
+    }
+
+    /* THEME TOGGLE */
+    .theme-toggle {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px;
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-subtle);
+      gap: 2px;
+    }
+
+    .theme-toggle-btn {
+      border: none;
+      background: transparent;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: background 0.18s ease, color 0.18s ease, transform 0.1s ease;
+    }
+
+    .theme-toggle-btn--active {
+      background: var(--accent-soft);
+      color: var(--accent-strong);
+      font-weight: 600;
+      transform: translateY(-0.5px);
+    }
+
+    .theme-toggle-btn:active {
+      transform: translateY(0.5px);
+    }
+
+    /* LAYOUT PRINCIPALE */
+    .main-grid {
+      display: grid;
+      grid-template-columns: minmax(260px, 340px) minmax(0, 1fr);
+      gap: 20px;
+      align-items: flex-start;
+    }
+
+    .panel {
+      background: var(--bg-subtle);
+      border-radius: 18px;
+      border: 1px solid var(--border-subtle);
+      padding: 14px 16px 16px;
+      box-shadow: var(--shadow-subtle);
+      transition: background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    body.theme-dark .panel {
+      background: rgba(15, 23, 42, 0.96);
+    }
+
+    .panel-header {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      margin-bottom: 12px;
+    }
+
+    .panel-header h2 {
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-secondary);
+    }
+
+    .panel-header p {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .panel-inputs {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .panel-results {
+      min-height: 280px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    /* CAMPI / FORM */
+    .field-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 4px;
+    }
+
+    .field-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+    }
+
+    input[type="number"],
+    select {
+      width: 100%;
+      padding: 8px 10px;
+      font-size: 13px;
+      border-radius: 8px;
+      border: 1px solid var(--border-strong);
+      background-color: #ffffff;
+      color: var(--text-primary);
+      outline: none;
+      transition: border 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, color 0.15s ease;
+      appearance: none;
+    }
+
+    input[type="number"]::placeholder {
+      color: var(--text-muted);
+    }
+
+    input[type="number"]:focus,
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.3);
+      background-color: #ffffff;
+    }
+
+    body.theme-dark input[type="number"],
+    body.theme-dark select {
+      background-color: #020617;
+      border-color: #1f2937;
+      color: #e5e7eb;
+    }
+
+    body.theme-dark input[type="number"]::placeholder {
+      color: #6b7280;
+    }
+
+    /* BIFACCIALE – switch minimale */
+    .field-toggle {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: #ffffff;
+      border: 1px dashed var(--border-subtle);
+      transition: background 0.25s ease, border-color 0.25s ease;
+    }
+
+    body.theme-dark .field-toggle {
+      background: #020617;
+      border-color: #1f2937;
+    }
+
+    #bifacciale {
+      width: 40px;
+      height: 22px;
+      appearance: none;
+      border-radius: 999px;
+      background: #e5e7eb;
+      position: relative;
+      cursor: pointer;
+      transition: background 0.18s ease;
+      flex-shrink: 0;
+    }
+
+    #bifacciale::before {
+      content: "";
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      background: #ffffff;
+      top: 2px;
+      left: 2px;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.35);
+      transition: transform 0.18s ease;
+    }
+
+    #bifacciale:checked {
+      background: var(--accent-soft);
+    }
+
+    #bifacciale:checked::before {
+      transform: translateX(18px);
+    }
+
+    .toggle-text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .toggle-text label[for="bifacciale"] {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-primary);
+      cursor: pointer;
+    }
+
+    .toggle-text span {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* SELETTORI INSTALLAZIONE / PROVINCIA */
+    .select-wrapper {
+      position: relative;
+    }
+
+    .select-wrapper::after {
+      content: "▾";
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 11px;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .provincia-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .provincia-pill {
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 12px;
+      color: #ffffff;
+      min-width: 90px;
+      text-align: right;
+      border: 1px solid rgba(15, 23, 42, 0.1);
+      box-shadow: 0 2px 5px rgba(15, 23, 42, 0.12);
+      transition: box-shadow 0.25s ease, border-color 0.25s ease;
+    }
+
+    body.theme-dark .provincia-pill {
+      border-color: rgba(15, 23, 42, 0.7);
+      box-shadow: 0 2px 5px rgba(15, 23, 42, 0.8);
+    }
+
+    /* ALERT */
+    #alertContainer {
+      font-size: 13px;
+    }
+
+    .alert {
+      margin-top: 0;
+      padding: 10px 11px;
+      border-radius: 10px;
+      background: #fef2f2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+      line-height: 1.4;
+    }
+
+    .alert a {
+      color: #b91c1c;
+      font-weight: 500;
+      text-decoration: underline;
+    }
+
+    .alert a:hover {
+      text-decoration: none;
+    }
+
+    body.theme-dark .alert {
+      background: #111827;
+      color: #fecaca;
+      border-color: #b91c1c;
+    }
+
+    body.theme-dark .alert a {
+      color: #fecaca;
+    }
+
+    /* CARDS RISULTATI */
+    .cards {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 420px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .cards::-webkit-scrollbar {
+      width: 4px;
+    }
+    .cards::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .cards::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.7);
+      border-radius: 999px;
+    }
+
+    body.theme-dark .cards::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.9);
+    }
+
+    .card {
+      position: relative;
+      background: #ffffff;
+      border-radius: 12px;
+      border: 1px solid var(--border-subtle);
+      padding: 10px 11px 9px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      cursor: pointer;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+      transition:
+        box-shadow 0.14s ease,
+        transform 0.14s ease,
+        border-color 0.14s ease,
+        background 0.14s ease,
+        color 0.14s ease;
+    }
+
+    .card.green {
+      border-left: 3px solid var(--success);
+    }
+
+    .card.red {
+      border-left: 3px solid var(--danger);
+    }
+
+    .card.yellow {
+      border-left: 3px solid var(--warning);
+    }
+
+    .card.best {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.2), 0 6px 16px rgba(37, 99, 235, 0.18);
+    }
+
+    .card-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .card-icon {
+      font-size: 22px;
+      margin-right: 6px;
+    }
+
+    .card-title-block {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .card h2 {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .card-tag {
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: #e0f2fe;
+      color: #075985;
+    }
+
+    .card p {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .card .cabinet,
+    .card .price,
+    .card .priceClient {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .card .margin,
+    .card .marginClient,
+    .card .marginInstall,
+    .card .marginKm {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--success);
+    }
+
+    .card .bifacciale-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--danger);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    body.theme-dark .card {
+      background: linear-gradient(145deg, #0f172a, #020617);
+      border-color: #1e293b;
+      color: #e5e7eb;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.9);
+    }
+
+    body.theme-dark .card:hover {
+      background: #020617;
+    }
+
+    body.theme-dark .card p {
+      color: #9ca3af;
+    }
+
+    body.theme-dark .card .cabinet,
+    body.theme-dark .card .price,
+    body.theme-dark .card .priceClient {
+      color: #e5e7eb;
+    }
+
+    body.theme-dark .card .margin,
+    body.theme-dark .card .marginClient,
+    body.theme-dark .card .marginInstall,
+    body.theme-dark .card .marginKm {
+      color: #22c55e;
+    }
+
+    .card:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 14px rgba(15, 23, 42, 0.16);
+      background: #f9fafb;
+    }
+
+    /* Tooltip minimal */
+    .tooltip {
+      position: relative;
+      border-bottom: 1px dotted var(--border-strong);
+    }
+
+    .tooltip .tooltiptext {
+      visibility: hidden;
+      width: 230px;
+      background-color: #111827;
+      color: #f9fafb;
+      text-align: left;
+      border-radius: 8px;
+      padding: 8px 9px;
+      position: absolute;
+      z-index: 20;
+      bottom: 130%;
+      left: 0;
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity 0.18s ease, transform 0.18s ease;
+      font-size: 11px;
+      border: 1px solid rgba(55, 65, 81, 0.7);
+      box-shadow: 0 10px 20px rgba(17, 24, 39, 0.45);
+    }
+
+    body.theme-dark .tooltip .tooltiptext {
+      background-color: #020617;
+      border-color: #1f2937;
+      color: #f9fafb;
+    }
+
+    .tooltip:hover .tooltiptext {
+      visibility: visible;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* POPUP contenuto */
+    .card-popup {
+      position: absolute;
+      inset: 6px 6px 6px 6px;
+      background: #111827;
+      color: #f9fafb;
+      padding: 10px 10px 8px;
+      border-radius: 10px;
+      display: block;
+      opacity: 0;
+      transform: translateY(10px);
+      z-index: 30;
+      font-size: 12px;
+      overflow-y: auto;
+      border: 1px solid rgba(75, 85, 99, 0.7);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .card.show-popup .card-popup {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    body.theme-dark .card-popup {
+      background: #020617;
+      border-color: #1f2937;
+      color: #e5e7eb;
+    }
+
+    /* BOTTONE RICHIESTA */
+    .btn-request {
+      margin-top: 4px;
+      align-self: flex-start;
+      padding: 7px 12px;
+      font-size: 12px;
+      font-weight: 500;
+      background: #111827;
+      color: #f9fafb;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.35);
+      transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+    }
+
+    .btn-request::after {
+      content: "↗";
+      font-size: 11px;
+    }
+
+    .btn-request:hover {
+      transform: translateY(-1px);
+      background: #030712;
+      box-shadow: 0 4px 10px rgba(15, 23, 42, 0.45);
+    }
+
+    .btn-request:active {
+      transform: translateY(0);
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.5);
+    }
+
+    body.theme-dark .btn-request {
+      background: #0b1120;
+      color: #e5e7eb;
+    }
+
+    body.theme-dark .btn-request:hover {
+      background: #020617;
+    }
+
+    /* PANEL LAYOUT */
+    .panel-layout {
+      margin-top: 16px;
+    }
+
+    #layoutContainer {
+      margin-top: 4px;
+      font-size: 13px;
+    }
+
+    #layoutContainer h3 {
+      margin-bottom: 8px;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+    }
+
+    #layoutContainer > div {
+      margin: 0 auto 10px;
+    }
+
+    /* Celle layout: vengono create da JS */
+    #layoutContainer > div > div {
+      border-radius: 4px;
+      background: #dbeafe;
+      border: 1px solid #bfdbfe;
+    }
+
+    body.theme-dark #layoutContainer > div > div {
+      background: #1f2937;
+      border-color: #0f172a;
+    }
+
+    /* SPLASH MINIMAL */
+    #splash {
+      position: fixed;
+      inset: 0;
+      background: #111827;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      z-index: 9999;
+      opacity: 1;
+      transition: opacity 0.8s ease;
+    }
+
+    #splash.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    #splash-logo {
+      font-size: 24px;
+      text-transform: uppercase;
+      letter-spacing: 0.4em;
+      color: #f9fafb;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    #loading-bar {
+      width: 220px;
+      height: 6px;
+      border-radius: 999px;
+      background: #1f2937;
+      overflow: hidden;
+    }
+
+    #loading-fill {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #38bdf8, #4f46e5);
+      transition: width 0.3s ease;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      .app-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .heading-area {
+        text-align: left;
+      }
+      .badge-area {
+        align-items: flex-start;
+      }
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+      .panel-results {
+        order: 2;
+      }
+      .panel-layout {
+        order: 3;
+      }
+    }
+  </style>
 </head>
-<body>
-<canvas id="particle-bg"></canvas>
-<div id="splash"><div id="splash-logo">SEEMAX</div><div id="loading-bar"><div id="loading-fill"></div></div></div>
+<body class="theme-minimal">
+  <canvas id="particle-bg"></canvas>
 
-<div class="container">
-  <h1>Calcolatore Ledwall Ufficiale Seemax</h1>
-  <h3>Calcola e pianifica i tuoi preventivi in maniera dettagliata</h3>
-
-  <div class="input-group">
-    <div>
-      <label for="base">Base (cm):</label>
-      <input type="number" id="base" placeholder="Es. 200" />
-    </div>
-    <div>
-      <label for="altezza">Altezza (cm):</label>
-      <input type="number" id="altezza" placeholder="Es. 200" />
-    </div>
-    <div style="display:flex; align-items:center; gap:10px; margin-top:30px;">
-      <input type="checkbox" id="bifacciale" />
-      <label for="bifacciale" style="font-weight:bold; color:#00aaff; cursor:pointer;">Bifacciale</label>
-    </div>
+  <!-- SPLASH -->
+  <div id="splash">
+    <div id="splash-logo">SEEMAX</div>
+    <div id="loading-bar"><div id="loading-fill"></div></div>
   </div>
 
-  <!-- Tipo Installazione -->
-  <div class="input-group" aria-label="Tipo Installazione">
-    <div style="flex:1 1 100%">
-      <label for="installazione">Installazione</label>
-      <select id="installazione">
-        <option value="personalizza" selected>Da Personalizzare</option>
-        <option value="parete">A parete</option>
-        <option value="bandiera">A bandiera</option>
-        <option value="palo">Su Palo</option>
-        <option value="vetrina">A vetrina</option>
-      </select>
-    </div>
-  </div>
-  
-  <!-- Provincia Installazione con pill -->
-  <div class="input-group" aria-label="Provincia Installazione">
-    <div style="flex:1 1 100%">
-      <label for="provincia">Provincia installazione</label>
-      <div class="provincia-row">
-        <select id="provincia">
-          <option value="Catania" selected>Catania (CT)</option>
-          <option value="Siracusa">Siracusa (SR)</option>
-          <option value="Enna">Enna (EN)</option>
-          <option value="Ragusa">Ragusa (RG)</option>
-          <option value="Messina">Messina (ME)</option>
-          <option value="Caltanissetta">Caltanissetta (CL)</option>
-          <option value="Agrigento">Agrigento (AG)</option>
-          <option value="Palermo">Palermo (PA)</option>
-          <option value="Trapani">Trapani (TP)</option>
-        </select>
-        <div id="provinciaPill" class="provincia-pill">+€ 0</div>
+  <div class="app-frame">
+    <div class="container">
+      <!-- HEADER -->
+      <header class="app-header">
+        <div class="brand-area">
+          <div class="brand-logo">S</div>
+          <div class="brand-text">
+            <span>Seemax Display</span>
+            <span>Led Lab Company</span>
+          </div>
+        </div>
+        <div class="heading-area">
+          <h1>CALCOLATORE LEDWALL</h1>
+          <p>Strumento amministrativo per la pianificazione dei preventivi. 2.0.0</p>
+        </div>
+        <div class="badge-area">
+          <div class="pill">
+            <span class="pill-dot"></span>
+            <span>Admin tool</span>
+          </div>
+          <div class="theme-toggle" aria-label="Selettore stile interfaccia">
+            <button type="button" class="theme-toggle-btn theme-toggle-btn--active" data-theme="minimal">Minimal</button>
+            <button type="button" class="theme-toggle-btn" data-theme="dark">Dark</button>
+          </div>
+          <span class="tag">Created by: David Failla</span>
+        </div>
+      </header>
+
+      <!-- LAYOUT PRINCIPALE -->
+      <div class="main-grid">
+        <!-- SINISTRA: INPUT -->
+        <section class="panel panel-inputs">
+          <div class="panel-header">
+            <h2>Parametri impianto</h2>
+            <p>Definisci dimensioni, tipologia installazione e provincia.</p>
+          </div>
+
+          <div class="field-grid">
+            <div class="field">
+              <label for="base" class="field-label">Base (cm)</label>
+              <input type="number" id="base" placeholder="Es. 200" />
+            </div>
+            <div class="field">
+              <label for="altezza" class="field-label">Altezza (cm)</label>
+              <input type="number" id="altezza" placeholder="Es. 200" />
+            </div>
+          </div>
+
+          <div class="field">
+            <div class="field-toggle">
+              <input type="checkbox" id="bifacciale" />
+              <div class="toggle-text">
+                <label for="bifacciale">Bifacciale</label>
+                <span>Raddoppia la superficie visualizzata (fronte/retro).</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="installazione" class="field-label">Installazione</label>
+            <div class="select-wrapper">
+              <select id="installazione">
+                <option value="personalizza" selected>Da personalizzare</option>
+                <option value="parete">A parete</option>
+                <option value="bandiera">A bandiera</option>
+                <option value="palo">Su palo</option>
+                <option value="vetrina">A vetrina</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="provincia" class="field-label">Provincia installazione</label>
+            <div class="provincia-row">
+              <div class="select-wrapper" style="flex:1;">
+                <select id="provincia">
+                  <option value="Catania" selected>Catania (CT)</option>
+                  <option value="Siracusa">Siracusa (SR)</option>
+                  <option value="Enna">Enna (EN)</option>
+                  <option value="Ragusa">Ragusa (RG)</option>
+                  <option value="Messina">Messina (ME)</option>
+                  <option value="Caltanissetta">Caltanissetta (CL)</option>
+                  <option value="Agrigento">Agrigento (AG)</option>
+                  <option value="Palermo">Palermo (PA)</option>
+                  <option value="Trapani">Trapani (TP)</option>
+                </select>
+              </div>
+              <div id="provinciaPill" class="provincia-pill">+€ 0</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- DESTRA: RISULTATI / CARDS -->
+        <section class="panel panel-results">
+          <div class="panel-header">
+            <h2>Soluzioni LEDWALL</h2>
+            <p>I modelli e i prezzi si aggiornano in base ai parametri inseriti.</p>
+          </div>
+
+          <div id="alertContainer"></div>
+          <div class="cards" id="cardsContainer"></div>
+        </section>
       </div>
+
+      <!-- LAYOUT MODULI -->
+      <section class="panel panel-layout">
+        <div class="panel-header">
+          <h2>Schema moduli</h2>
+          <p>Visualizzazione semplificata dei cabinet necessari.</p>
+        </div>
+        <div id="layoutContainer"></div>
+      </section>
     </div>
   </div>
 
-  <div id="alertContainer"></div>
-  <div class="cards" id="cardsContainer"></div>
-  <div id="layoutContainer"></div>
-</div>
+  <script>
+    // PARTICLE BACKGROUND
+    const canvas = document.getElementById('particle-bg');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    function resizeCanvas(){canvas.width=window.innerWidth; canvas.height=window.innerHeight;}
+    window.addEventListener('resize', resizeCanvas); resizeCanvas();
+    for(let i=0;i<80;i++){
+      particles.push({
+        x:Math.random()*canvas.width,
+        y:Math.random()*canvas.height,
+        r:Math.random()*2+1,
+        dx:(Math.random()-0.5)/2,
+        dy:(Math.random()-0.5)/2
+      });
+    }
+    function drawParticles(){
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      particles.forEach(p=>{
+        ctx.beginPath();
+        ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+        ctx.fillStyle='rgba(0,198,255,0.3)';
+        ctx.fill();
+        p.x+=p.dx;
+        p.y+=p.dy;
+        if(p.x<0||p.x>canvas.width)p.dx*=-1;
+        if(p.y<0||p.y>canvas.height)p.dy*=-1;
+      });
+      requestAnimationFrame(drawParticles);
+    }
+    drawParticles();
 
-<script>
-// PARTICLE BACKGROUND
-const canvas = document.getElementById('particle-bg');
-const ctx = canvas.getContext('2d');
-let particles = [];
-function resizeCanvas(){canvas.width=window.innerWidth; canvas.height=window.innerHeight;}
-window.addEventListener('resize', resizeCanvas); resizeCanvas();
-for(let i=0;i<80;i++){particles.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, r:Math.random()*2+1, dx:(Math.random()-0.5)/2, dy:(Math.random()-0.5)/2});}
-function drawParticles(){ ctx.clearRect(0,0,canvas.width,canvas.height); particles.forEach(p=>{ ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fillStyle='rgba(0,198,255,0.3)'; ctx.fill(); p.x+=p.dx; p.y+=p.dy; if(p.x<0||p.x>canvas.width)p.dx*=-1; if(p.y<0||p.y>canvas.height)p.dy*=-1; }); requestAnimationFrame(drawParticles); }
-drawParticles();
+    // SPLASH SCREEN
+    const splash = document.getElementById('splash');
+    const fill = document.getElementById('loading-fill');
+    let width = 0;
+    const interval = setInterval(()=>{
+      width += 2;
+      fill.style.width = width + '%';
+      if(width >= 100){
+        clearInterval(interval);
+        setTimeout(()=>{ splash.classList.add('hidden'); },300);
+      }
+    },30);
 
-// SPLASH SCREEN
-const splash = document.getElementById('splash');
-const fill = document.getElementById('loading-fill');
-let width = 0;
-const interval = setInterval(()=>{ width += 2; fill.style.width = width + '%'; if(width >= 100){ clearInterval(interval); setTimeout(()=>{ splash.classList.add('hidden'); },300); } },30);
+    // LISTINO
+    const ledwalls = [
+      { nome:"P1.9",  cabX:50, cabY:100, prezzoAgente:850, prezzoCliente:950, prezzoCina:560, info:"Ledwall Display P1.9 | Misura Cabinet: 0.50x1.00 | Indoor | COSTO CINA: 560€ (incl. 30% spedizione)", icon:"🖥️" },
+      { nome:"P2.5",  cabX:64, cabY:64,  prezzoAgente:675, prezzoCliente:765, prezzoCina:450, info:"Ledwall Display P2.5 | 0.64x0.64 | In/Out | COSTO CINA: 450€ (incl. 30% spedizione)", icon:"🖥️" },
+      { nome:"P3",    cabX:57, cabY:57,  prezzoAgente:375, prezzoCliente:425, prezzoCina:250, info:"Ledwall Display P3 | 0.57x0.57 | In/Out | COSTO CINA: 250€", icon:"🖥️" },
+      { nome:"P3.91", cabX:50, cabY:100, prezzoAgente:450, prezzoCliente:550, prezzoCina:280, info:"Ledwall Display P3.91 | 0.50x1.00 | In/Out | COSTO CINA: 280€", icon:"🖥️" },
+      { nome:"P4",    cabX:96, cabY:96,  prezzoAgente:750, prezzoCliente:850, prezzoCina:580, info:"Ledwall Display P4 | 0.96x0.96 | Outdoor | COSTO CINA: 580€", icon:"🖥️" }
+    ];
 
-// LISTINO
-const ledwalls = [
-  { nome:"P1.9",  cabX:50, cabY:100, prezzoAgente:850, prezzoCliente:950, prezzoCina:560, info:"Ledwall Display P1.9 | Misura Cabinet: 0.50x1.00 | Indoor | COSTO CINA: 560€ (incl. 30% spedizione)", icon:"🖥️" },
-  { nome:"P2.5",  cabX:64, cabY:64,  prezzoAgente:675, prezzoCliente:765, prezzoCina:450, info:"Ledwall Display P2.5 | 0.64x0.64 | In/Out | COSTO CINA: 450€ (incl. 30% spedizione)", icon:"🖥️" },
-  { nome:"P3",    cabX:57, cabY:57,  prezzoAgente:375, prezzoCliente:425, prezzoCina:250, info:"Ledwall Display P3 | 0.57x0.57 | In/Out | COSTO CINA: 250€", icon:"🖥️" },
-  { nome:"P3.91", cabX:50, cabY:100, prezzoAgente:450, prezzoCliente:550, prezzoCina:280, info:"Ledwall Display P3.91 | 0.50x1.00 | In/Out | COSTO CINA: 280€", icon:"🖥️" },
-  { nome:"P4",    cabX:96, cabY:96,  prezzoAgente:750, prezzoCliente:850, prezzoCina:580, info:"Ledwall Display P4 | 0.96x0.96 | Outdoor | COSTO CINA: 580€", icon:"🖥️" }
-];
+    // INSTALLAZIONE – fasce fino a 20+
+    const INSTALL_COSTS = [
+      { th:1.5,  parete:500,  bandiera:500,  palo:500,  vetrina:400 },
+      { th:2.0,  parete:650,  bandiera:600,  palo:600,  vetrina:500 },
+      { th:2.75, parete:680,  bandiera:620,  palo:620,  vetrina:520 },
+      { th:3.0,  parete:700,  bandiera:680,  palo:680,  vetrina:550 },
+      { th:4.0,  parete:850,  bandiera:750,  palo:750,  vetrina:600 },
+      { th:5.0,  parete:1000, bandiera:900,  palo:900,  vetrina:700 },
+      { th:6.0,  parete:1100, bandiera:1000, palo:1000, vetrina:800 },
+      { th:7.0,  parete:1200, bandiera:1100, palo:1100, vetrina:900 },
+      { th:8.0,  parete:1300, bandiera:1200, palo:1200, vetrina:1000 },
+      { th:9.0,  parete:1400, bandiera:1300, palo:1300, vetrina:1100 },
+      { th:15.0, parete:1550, bandiera:1450, palo:1450, vetrina:1200 },
+      { th:20.0, parete:1800, bandiera:1650, palo:1650, vetrina:1500 },
+      { th:1e9,  parete:2000, bandiera:1950, palo:1950, vetrina:1800 }
+    ];
+    function installCost(areaMq, tipo){
+      if(tipo==='personalizza') return 0;
+      let rec = INSTALL_COSTS.find(r => areaMq <= r.th) || INSTALL_COSTS[INSTALL_COSTS.length-1];
+      switch(tipo){
+        case 'parete':   return rec.parete;
+        case 'bandiera': return rec.bandiera;
+        case 'palo':     return rec.palo;
+        case 'vetrina':  return rec.vetrina;
+        default:         return 0;
+      }
+    }
 
-// INSTALLAZIONE – fasce fino a 20+
-const INSTALL_COSTS = [
-  { th:1.5,  parete:500,  bandiera:500,  palo:500,  vetrina:400 },
-  { th:2.0,  parete:650,  bandiera:600,  palo:600,  vetrina:500 },
-  { th:2.75, parete:680,  bandiera:620,  palo:620,  vetrina:520 },
-  { th:3.0,  parete:700,  bandiera:680,  palo:680,  vetrina:550 },
-  { th:4.0,  parete:850,  bandiera:750,  palo:750,  vetrina:600 },
-  { th:5.0,  parete:1000, bandiera:900,  palo:900,  vetrina:700 },
-  { th:6.0,  parete:1100, bandiera:1000, palo:1000, vetrina:800 },
-  { th:7.0,  parete:1200, bandiera:1100, palo:1100, vetrina:900 },
-  { th:8.0,  parete:1300, bandiera:1200, palo:1200, vetrina:1000 },
-  { th:9.0,  parete:1400, bandiera:1300, palo:1300, vetrina:1100 },
-  { th:15.0, parete:1550, bandiera:1450, palo:1450, vetrina:1200 },
-  { th:20.0, parete:1800, bandiera:1650, palo:1650, vetrina:1500 },
-  { th:1e9,  parete:2000, bandiera:1950, palo:1950, vetrina:1800 }
-];
-function installCost(areaMq, tipo){
-  if(tipo==='personalizza') return 0;
-  let rec = INSTALL_COSTS.find(r => areaMq <= r.th) || INSTALL_COSTS[INSTALL_COSTS.length-1];
-  switch(tipo){ case 'parete': return rec.parete; case 'bandiera': return rec.bandiera; case 'palo': return rec.palo; case 'vetrina': return rec.vetrina; default: return 0; }
-}
-
-// Provincia – km da Catania e costo/km
-const PROVINCE_KM = { Catania:0, Siracusa:51, Enna:71, Ragusa:72, Messina:87, Caltanissetta:90, Agrigento:135, Palermo:166, Trapani:231 };
-const COSTO_KM = 2.0;
-
-// DOM refs
-const baseInput = document.getElementById('base');
-const altezzaInput = document.getElementById('altezza');
-const bifaccialeInput = document.getElementById('bifacciale');
-const installazioneSelect = document.getElementById('installazione');
-const provinciaSelect = document.getElementById('provincia');
-const provinciaPill = document.getElementById('provinciaPill');
-const cardsContainer = document.getElementById('cardsContainer');
-const alertContainer = document.getElementById('alertContainer');
-const layoutContainer = document.getElementById('layoutContainer');
-const whatsappNumber = "393294397445";
-
-let currentPopup = null;
-
-function setProvinciaPill(){
-  const km = PROVINCE_KM[provinciaSelect.value] || 0;
-  const euro = km * COSTO_KM;
-  const maxEuro = PROVINCE_KM['Trapani'] * COSTO_KM;
-  const ratio = Math.min(1, euro/maxEuro);
-  const hue = 120 - (120*ratio); // verde->rosso
-  provinciaPill.style.backgroundColor = `hsl(${hue},85%,45%)`;
-  provinciaPill.textContent = `+€ ${Math.round(euro).toLocaleString('it-IT')}`;
-  provinciaPill.title = `Sovrapprezzo trasferta (${km} km × €${COSTO_KM.toFixed(2)}/km)`;
-}
-
-function animateValue(el,start,end,duration){ let t0=null; const step=(t)=>{ if(!t0)t0=t; const p=Math.min((t-t0)/duration,1); el.textContent=Math.floor(start+(end-start)*p).toLocaleString('it-IT'); if(p<1) requestAnimationFrame(step); }; requestAnimationFrame(step); }
-
-function aggiornaLayout(models, rotatedMatchFlag){
-  layoutContainer.innerHTML = "";
-  if (Array.isArray(models) && models.length > 1) {
-    const p19 = models.find(m=>m.nome==='P1.9'); const p391 = models.find(m=>m.nome==='P3.91');
-    if(p19 && p391 && models.length===2){ layoutContainer.innerHTML += `<h3>Layout suggerito per P1.9 / P3.91</h3>`; generaLayout(p19, rotatedMatchFlag); }
-    else { models.forEach(m=>{ layoutContainer.innerHTML += `<h3>Layout suggerito per ${m.nome}</h3>`; generaLayout(m, rotatedMatchFlag); }); }
-  } else { const m = Array.isArray(models)?models[0]:models; layoutContainer.innerHTML = `<h3>Layout suggerito per ${m.nome}</h3>`; generaLayout(m, rotatedMatchFlag); }
-  if(rotatedMatchFlag){ const warn=document.createElement('div'); warn.className='alert'; warn.innerHTML='⚠️ È possibile ruotare alcuni cabinet rettangolari per ottenere questa misura, ma non è consigliato.'; layoutContainer.appendChild(warn); }
-}
-
-function generaLayout(model, rotatedMatchFlag){
-  const bif=bifaccialeInput.checked; const layout=document.createElement('div'); layout.style.display='grid'; layout.style.gridGap='3px'; layout.style.justifyContent='center';
-  const isRect = model.cabX===50 && model.cabY===100; const blockW = isRect && rotatedMatchFlag ? 60 : 30; const blockH = isRect && rotatedMatchFlag ? 30 : (isRect ? 60 : 30);
-  const base=parseFloat(baseInput.value)||0; const alt=parseFloat(altezzaInput.value)||0;
-  let cols = rotatedMatchFlag && isRect ? Math.ceil(base/model.cabY) : Math.ceil(base/model.cabX);
-  let rows = rotatedMatchFlag && isRect ? Math.ceil(alt/model.cabX) : Math.ceil(alt/model.cabY);
-  layout.style.gridTemplateColumns=`repeat(${cols}, ${blockW}px)`; layout.style.gridTemplateRows=`repeat(${rows}, ${blockH}px)`;
-  for(let r=0;r<rows;r++){ for(let c=0;c<cols;c++){ const cell=document.createElement('div'); cell.style.width=`${blockW}px`; cell.style.height=`${blockH}px`; cell.style.borderRadius='4px'; cell.style.margin='1px'; cell.style.backgroundColor=bif?'#ff6f61':'#00aaff'; if(bif) cell.style.border='2px solid red'; layout.appendChild(cell);} }
-  layoutContainer.appendChild(layout);
-}
-
-function aggiornaCards(){
-  const base = parseFloat(baseInput.value); const altezza = parseFloat(altezzaInput.value); const bif=bifaccialeInput.checked; const tipoInst=installazioneSelect.value;
-  cardsContainer.innerHTML=''; alertContainer.innerHTML=''; layoutContainer.innerHTML=''; setProvinciaPill();
-  if(!base || !altezza) return;
-
-  const kmSelezionati = PROVINCE_KM[provinciaSelect.value] || 0; // <-- km correnti
-  const extraKm = kmSelezionati * COSTO_KM;                       // <-- € km
-
-  let results = ledwalls.map(model=>{
-    const isRect = model.cabX===50 && model.cabY===100;
-    let perfect=false, rotated=false;
-    if(isRect){ perfect=(base%model.cabX===0 && altezza%model.cabY===0); rotated=(!perfect && (base%model.cabY===0 && altezza%model.cabX===0)); }
-    else { perfect=(base%model.cabX===0 && altezza%model.cabY===0); rotated=false; }
-
-    const cols = rotated? Math.ceil(base/model.cabY) : Math.ceil(base/model.cabX);
-    const rows = rotated? Math.ceil(altezza/model.cabX) : Math.ceil(altezza/model.cabY);
-
-    let totalCab = cols*rows;
-    let prezzoClienteBase = totalCab * model.prezzoCliente; // solo display
-    let prezzoAgenteBase  = totalCab * model.prezzoAgente;  // solo display
-    let margineCliente    = prezzoClienteBase - (totalCab * model.prezzoCina);
-    let margineAgente     = prezzoAgenteBase  - (totalCab * model.prezzoCina);
-
-    if(bif){ totalCab*=2; prezzoClienteBase*=2; prezzoAgenteBase*=2; margineCliente*=2; margineAgente*=2; }
-
-    const displayWidth = cols*(rotated?model.cabY:model.cabX);
-    const displayHeight= rows*(rotated?model.cabX:model.cabY);
-
-    const areaMq = (displayWidth/100) * (displayHeight/100);
-    const extraInstall = installCost(areaMq, tipoInst); // € installazione
-
-    // *** Totali mostrati in card = Display + Installazione + Km
-    const prezzoClienteTotale = prezzoClienteBase + extraInstall + extraKm;
-    const prezzoAgenteTotale  = prezzoAgenteBase  + extraInstall + extraKm;
-
-    const diffX=Math.abs(base - displayWidth); const diffY=Math.abs(altezza - displayHeight); const diff=diffX+diffY;
-
-    return { ...model,
-      colsNeeded:cols, rowsNeeded:rows, totalCab,
-      prezzoClienteTotale, prezzoAgenteTotale, // <-- ora includono provincia e installazione
-      margineCliente, margineAgente,           // margini solo display (come richiesto)
-      margineInstallazione: extraInstall,
-      margineKm: extraKm,
-      diff, perfectMatch:perfect, rotatedMatch:rotated,
-      displayWidth, displayHeight,
-      nearestBase: Math.round(base/model.cabX)*model.cabX,
-      nearestAltezza: Math.round(altezza/model.cabY)*model.cabY,
-      bifacciale:bif,
-      prezzoTotale: prezzoClienteTotale        // per ordinamento/tie-break
+    // Provincia – km da Catania e costo/km
+    const PROVINCE_KM = {
+      Catania:0, Siracusa:51, Enna:71, Ragusa:72,
+      Messina:87, Caltanissetta:90, Agrigento:135,
+      Palermo:166, Trapani:231
     };
-  });
+    const COSTO_KM = 2.0;
 
-  const perfectMatches = results.filter(r=>r.perfectMatch);
-  const rotatedMatches = results.filter(r=>r.rotatedMatch);
-  const bestMatch = results.reduce((p,c)=> c.diff<p.diff?c:p);
-  results.sort((a,b)=>{ if(a.perfectMatch&&!b.perfectMatch) return -1; if(!a.perfectMatch&&b.perfectMatch) return 1; return (a.diff+a.prezzoTotale*0.0001)-(b.diff+b.prezzoTotale*0.0001); });
-  const bestPriceModel = results.reduce((p,c)=> c.prezzoTotale<p.prezzoTotale?c:p);
+    // DOM refs
+    const baseInput = document.getElementById('base');
+    const altezzaInput = document.getElementById('altezza');
+    const bifaccialeInput = document.getElementById('bifacciale');
+    const installazioneSelect = document.getElementById('installazione');
+    const provinciaSelect = document.getElementById('provincia');
+    const provinciaPill = document.getElementById('provinciaPill');
+    const cardsContainer = document.getElementById('cardsContainer');
+    const alertContainer = document.getElementById('alertContainer');
+    const layoutContainer = document.getElementById('layoutContainer');
+    const whatsappNumber = "393294397445";
 
-  results.forEach(model=>{
-    const wrapper=document.createElement('div'); wrapper.style.display='flex'; wrapper.style.flexDirection='column'; wrapper.style.alignItems='center';
-    const card=document.createElement('div');
-    if(model.perfectMatch) card.className='card green'; else if(model.rotatedMatch) card.className='card yellow'; else card.className='card red';
-    if(model.nome===bestPriceModel.nome) card.classList.add('best');
+    let currentPopup = null;
 
-    const popup=document.createElement('div'); popup.className='card-popup'; popup.innerHTML=`<strong>${model.nome}</strong><br>${model.info}`; card.appendChild(popup);
+    function setProvinciaPill(){
+      const km = PROVINCE_KM[provinciaSelect.value] || 0;
+      const euro = km * COSTO_KM;
+      const maxEuro = PROVINCE_KM['Trapani'] * COSTO_KM;
+      const ratio = Math.min(1, euro/maxEuro);
+      const hue = 120 - (120*ratio); // verde->rosso
+      provinciaPill.style.backgroundColor = `hsl(${hue},85%,45%)`;
+      provinciaPill.textContent = `+€ ${Math.round(euro).toLocaleString('it-IT')}`;
+      provinciaPill.title = `Sovrapprezzo trasferta (${km} km × €${COSTO_KM.toFixed(2)}/km)`;
+    }
 
-    const whatsappLink=`https://wa.me/${whatsappNumber}?text=${encodeURIComponent((model.perfectMatch||model.rotatedMatch)?`Ti contatto dal calcolatore ADMIN per il modello ${model.nome} con misura ${base} x ${altezza}${model.bifacciale?" (Bifacciale)":""}.`:`Ti contatto dal calcolatore ADMIN per un preventivo personalizzato con modello ${model.nome} e misura ${base} x ${altezza}${model.bifacciale?" (Bifacciale)":""}.`)}`;
+    function animateValue(el,start,end,duration){
+      let t0=null;
+      const step=(t)=>{
+        if(!t0)t0=t;
+        const p=Math.min((t-t0)/duration,1);
+        el.textContent=Math.floor(start+(end-start)*p).toLocaleString('it-IT');
+        if(p<1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    }
 
-    card.innerHTML += `
-      <div class="card-icon">${model.icon}</div>
-      <h2>${model.nome}</h2>
-      <p class="tooltip">Dimensione Cabinet: ${model.cabX} x ${model.cabY} cm
-        <span class="tooltiptext">${model.info}</span>
-      </p>
-      ${(model.perfectMatch||model.rotatedMatch)?`
-        <p class="cabinet">Numero Cabinet: <span id="cab${model.nome}">0</span></p>
-        <p class="price">Prezzo Agente: <span id="priceAgent${model.nome}">0</span>€</p>
-        <p class="priceClient">Prezzo Cliente: <span id="priceClient${model.nome}">0</span>€</p>
-        <p class="margin">Margine su Agente: <span id="marginAgent${model.nome}">0</span>€</p>
-        <p class="marginClient">Margine su Cliente: <span id="marginClient${model.nome}">0</span>€</p>
-        <p class="marginInstall">Margine installazione: <span id="marginInst${model.nome}">0</span>€</p>
-        <p class="marginKm">Margine km: <span id="marginKm${model.nome}">0</span>€</p>
-        ${model.bifacciale?`<p class="bifacciale-label">BIFACCIALE</p>`:''}
-      `:`<p>Misura più vicina: ${model.nearestBase} x ${model.nearestAltezza} cm</p>`}
-    `;
+    function aggiornaLayout(models, rotatedMatchFlag){
+      layoutContainer.innerHTML = "";
+      if (Array.isArray(models) && models.length > 1) {
+        const p19 = models.find(m=>m.nome==='P1.9');
+        const p391 = models.find(m=>m.nome==='P3.91');
+        if(p19 && p391 && models.length===2){
+          layoutContainer.innerHTML += `<h3>Layout suggerito per P1.9 / P3.91</h3>`;
+          generaLayout(p19, rotatedMatchFlag);
+        } else {
+          models.forEach(m=>{
+            layoutContainer.innerHTML += `<h3>Layout suggerito per ${m.nome}</h3>`;
+            generaLayout(m, rotatedMatchFlag);
+          });
+        }
+      } else {
+        const m = Array.isArray(models)?models[0]:models;
+        layoutContainer.innerHTML = `<h3>Layout suggerito per ${m.nome}</h3>`;
+        generaLayout(m, rotatedMatchFlag);
+      }
+      if(rotatedMatchFlag){
+        const warn=document.createElement('div');
+        warn.className='alert';
+        warn.innerHTML='⚠️ È possibile ruotare alcuni cabinet verticali in maniera orizzantale per ottenere questa misura ma non è consigliato.';
+        layoutContainer.appendChild(warn);
+      }
+    }
 
-    const btn=document.createElement('button'); btn.className='btn-request'; btn.textContent='Richiedi Preventivo'; btn.onclick=()=>window.open(whatsappLink,'_blank');
+    function generaLayout(model, rotatedMatchFlag){
+      const bif=bifaccialeInput.checked;
+      const layout=document.createElement('div');
+      layout.style.display='grid';
+      layout.style.gridGap='2px';
+      layout.style.justifyContent='center';
 
-    card.addEventListener('click',(e)=>{ if(e.target.classList && e.target.classList.contains('btn-request')) return; if(currentPopup && currentPopup!==card){ currentPopup.classList.remove('show-popup'); } card.classList.toggle('show-popup'); currentPopup = card.classList.contains('show-popup') ? card : null; });
+      const isRect = model.cabX===50 && model.cabY===100;
+      const blockW = isRect && rotatedMatchFlag ? 26 : 18;
+      const blockH = isRect && rotatedMatchFlag ? 18 : (isRect ? 26 : 18);
 
-    wrapper.appendChild(card); wrapper.appendChild(btn); cardsContainer.appendChild(wrapper);
+      const base=parseFloat(baseInput.value)||0;
+      const alt=parseFloat(altezzaInput.value)||0;
+      let cols = rotatedMatchFlag && isRect ? Math.ceil(base/model.cabY) : Math.ceil(base/model.cabX);
+      let rows = rotatedMatchFlag && isRect ? Math.ceil(alt/model.cabX) : Math.ceil(alt/model.cabY);
 
-    if(model.perfectMatch || model.rotatedMatch){ setTimeout(()=>{ card.classList.add('show');
-      animateValue(document.getElementById(`cab${model.nome}`),0,model.totalCab,1200);
-      animateValue(document.getElementById(`priceAgent${model.nome}`),0,Math.round(model.prezzoAgenteTotale),1200);
-      animateValue(document.getElementById(`priceClient${model.nome}`),0,Math.round(model.prezzoClienteTotale),1200);
-      animateValue(document.getElementById(`marginAgent${model.nome}`),0,Math.round(model.margineAgente),1200);
-      animateValue(document.getElementById(`marginClient${model.nome}`),0,Math.round(model.margineCliente),1200);
-      animateValue(document.getElementById(`marginInst${model.nome}`),0,Math.round(model.margineInstallazione),1200);
-      animateValue(document.getElementById(`marginKm${model.nome}`),0,Math.round(model.margineKm),1200);
-    },50); }
-  });
+      layout.style.gridTemplateColumns=`repeat(${cols}, ${blockW}px)`;
+      layout.style.gridTemplateRows=`repeat(${rows}, ${blockH}px)`;
 
-  if(rotatedMatches.length>0){ alertContainer.innerHTML=`<div class="alert">⚠️ È possibile ruotare alcuni cabinet rettangolari per ottenere questa misura, ma non è consigliato.</div>`; aggiornaLayout(rotatedMatches,true); }
-  else if(perfectMatches.length===0){ alertContainer.innerHTML = `<div class="alert">Per questa misura ti consigliamo un <strong>${bestMatch.nome}</strong> con misure realizzabili ${bestMatch.displayWidth} x ${bestMatch.displayHeight} cm.<br>Puoi richiedere un preventivo personalizzato cliccando <a href="https://wa.me/${whatsappNumber}?text=${encodeURIComponent(`Ti contatto dal calcolatore ADMIN per un preventivo personalizzato con misura ${base} x ${altezza}${(bif? ' (Bifacciale)':'')}.`)}" target="_blank">qui</a>.</div>`; aggiornaLayout([bestMatch],false); }
-  else { aggiornaLayout(perfectMatches,false); }
-}
+      for(let r=0;r<rows;r++){
+        for(let c=0;c<cols;c++){
+          const cell=document.createElement('div');
+          cell.style.width=`${blockW}px`;
+          cell.style.height=`${blockH}px`;
+          cell.style.margin='1px';
+          cell.style.borderRadius='4px';
+          cell.style.backgroundColor=bif?'#fecaca':'#bfdbfe';
+          layout.appendChild(cell);
+        }
+      }
+      layoutContainer.appendChild(layout);
+    }
 
-baseInput.addEventListener('input', aggiornaCards);
-altezzaInput.addEventListener('input', aggiornaCards);
-bifaccialeInput.addEventListener('change', aggiornaCards);
-installazioneSelect.addEventListener('change', aggiornaCards);
-provinciaSelect.addEventListener('change', ()=>{ setProvinciaPill(); aggiornaCards(); });
-setProvinciaPill();
+    function aggiornaCards(){
+      const base = parseFloat(baseInput.value);
+      const altezza = parseFloat(altezzaInput.value);
+      const bif=bifaccialeInput.checked;
+      const tipoInst=installazioneSelect.value;
 
-// Effetto luce
-setInterval(()=>{ const cells=document.querySelectorAll('#layoutContainer > div > div'); cells.forEach((cell,i)=>{ const pulse=Math.sin(Date.now()/400+i)*0.4+0.6; cell.style.filter=`brightness(${pulse})`; }); },80);
-</script>
+      cardsContainer.innerHTML='';
+      alertContainer.innerHTML='';
+      layoutContainer.innerHTML='';
+      setProvinciaPill();
+
+      if(!base || !altezza) return;
+
+      const kmSelezionati = PROVINCE_KM[provinciaSelect.value] || 0;
+      const extraKm = kmSelezionati * COSTO_KM;
+
+      let results = ledwalls.map(model=>{
+        const isRect = model.cabX===50 && model.cabY===100;
+        let perfect=false, rotated=false;
+        if(isRect){
+          perfect=(base%model.cabX===0 && altezza%model.cabY===0);
+          rotated=(!perfect && (base%model.cabY===0 && altezza%model.cabX===0));
+        } else {
+          perfect=(base%model.cabX===0 && altezza%model.cabY===0);
+          rotated=false;
+        }
+
+        const cols = rotated? Math.ceil(base/model.cabY) : Math.ceil(base/model.cabX);
+        const rows = rotated? Math.ceil(altezza/model.cabX) : Math.ceil(altezza/model.cabY);
+
+        let totalCab = cols*rows;
+        let prezzoClienteBase = totalCab * model.prezzoCliente; // solo display
+        let prezzoAgenteBase  = totalCab * model.prezzoAgente;  // solo display
+        let margineCliente    = prezzoClienteBase - (totalCab * model.prezzoCina);
+        let margineAgente     = prezzoAgenteBase  - (totalCab * model.prezzoCina);
+
+        if(bif){
+          totalCab*=2;
+          prezzoClienteBase*=2;
+          prezzoAgenteBase*=2;
+          margineCliente*=2;
+          margineAgente*=2;
+        }
+
+        const displayWidth = cols*(rotated?model.cabY:model.cabX);
+        const displayHeight= rows*(rotated?model.cabX:model.cabY);
+
+        const areaMq = (displayWidth/100) * (displayHeight/100);
+        const extraInstall = installCost(areaMq, tipoInst);
+
+        const prezzoClienteTotale = prezzoClienteBase + extraInstall + extraKm;
+        const prezzoAgenteTotale  = prezzoAgenteBase  + extraInstall + extraKm;
+
+        const diffX=Math.abs(base - displayWidth);
+        const diffY=Math.abs(altezza - displayHeight);
+        const diff=diffX+diffY;
+
+        return {
+          ...model,
+          colsNeeded:cols,
+          rowsNeeded:rows,
+          totalCab,
+          prezzoClienteTotale,
+          prezzoAgenteTotale,
+          margineCliente,
+          margineAgente,
+          margineInstallazione: extraInstall,
+          margineKm: extraKm,
+          diff,
+          perfectMatch:perfect,
+          rotatedMatch:rotated,
+          displayWidth,
+          displayHeight,
+          nearestBase: Math.round(base/model.cabX)*model.cabX,
+          nearestAltezza: Math.round(altezza/model.cabY)*model.cabY,
+          bifacciale:bif,
+          prezzoTotale: prezzoClienteTotale
+        };
+      });
+
+      const perfectMatches = results.filter(r=>r.perfectMatch);
+      const rotatedMatches = results.filter(r=>r.rotatedMatch);
+      const bestMatch = results.reduce((p,c)=> c.diff<p.diff?c:p);
+
+      results.sort((a,b)=>{
+        if(a.perfectMatch&&!b.perfectMatch) return -1;
+        if(!a.perfectMatch&&b.perfectMatch) return 1;
+        return (a.diff+a.prezzoTotale*0.0001)-(b.diff+b.prezzoTotale*0.0001);
+      });
+
+      const bestPriceModel = results.reduce((p,c)=> c.prezzoTotale<p.prezzoTotale?c:p);
+
+      results.forEach(model=>{
+        const wrapper=document.createElement('div');
+        wrapper.style.display='flex';
+        wrapper.style.flexDirection='column';
+        wrapper.style.alignItems='stretch';
+
+        const card=document.createElement('div');
+        if(model.perfectMatch) card.className='card green';
+        else if(model.rotatedMatch) card.className='card yellow';
+        else card.className='card red';
+        if(model.nome===bestPriceModel.nome) card.classList.add('best');
+
+        const popup=document.createElement('div');
+        popup.className='card-popup';
+        popup.innerHTML=`<strong>${model.nome}</strong><br>${model.info}`;
+        card.appendChild(popup);
+
+        const whatsappLink=`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
+          (model.perfectMatch||model.rotatedMatch)
+          ? `Ti contatto dal calcolatore ADMIN per il modello ${model.nome} con misura ${base} x ${altezza}${model.bifacciale?" (Bifacciale)":""}.`
+          : `Ti contatto dal calcolatore ADMIN per un preventivo personalizzato con modello ${model.nome} e misura ${base} x ${altezza}${model.bifacciale?" (Bifacciale)":""}.`
+        )}`;
+
+        card.innerHTML += `
+          <div class="card-header-row">
+            <div class="card-title-block">
+              <div class="card-icon">${model.icon}</div>
+              <h2>${model.nome}</h2>
+            </div>
+          </div>
+          <p class="tooltip">Dimensione cabinet: ${model.cabX} × ${model.cabY} cm
+            <span class="tooltiptext">${model.info}</span>
+          </p>
+          ${(model.perfectMatch||model.rotatedMatch)?`
+            <p class="cabinet">Numero cabinet: <span id="cab${model.nome}">0</span></p>
+            <p class="price">Prezzo agente: <span id="priceAgent${model.nome}">0</span>€</p>
+            <p class="priceClient">Prezzo cliente: <span id="priceClient${model.nome}">0</span>€</p>
+            <p class="margin">Margine su agente: <span id="marginAgent${model.nome}">0</span>€</p>
+            <p class="marginClient">Margine su cliente: <span id="marginClient${model.nome}">0</span>€</p>
+            <p class="marginInstall">Margine installazione: <span id="marginInst${model.nome}">0</span>€</p>
+            <p class="marginKm">Margine km: <span id="marginKm${model.nome}">0</span>€</p>
+            ${model.bifacciale?`<p class="bifacciale-label">Bifacciale</p>`:''}
+          `:`<p>Misura più vicina: ${model.nearestBase} × ${model.nearestAltezza} cm</p>`}
+        `;
+
+        const btn=document.createElement('button');
+        btn.className='btn-request';
+        btn.textContent='Richiedi preventivo';
+        btn.onclick=()=>window.open(whatsappLink,'_blank');
+
+        card.addEventListener('click',(e)=>{
+          if(e.target.classList && e.target.classList.contains('btn-request')) return;
+          if(currentPopup && currentPopup!==card){
+            currentPopup.classList.remove('show-popup');
+          }
+          card.classList.toggle('show-popup');
+          currentPopup = card.classList.contains('show-popup') ? card : null;
+        });
+
+        wrapper.appendChild(card);
+        wrapper.appendChild(btn);
+        cardsContainer.appendChild(wrapper);
+
+        if(model.perfectMatch || model.rotatedMatch){
+          setTimeout(()=>{
+            animateValue(document.getElementById(`cab${model.nome}`),0,model.totalCab,1200);
+            animateValue(document.getElementById(`priceAgent${model.nome}`),0,Math.round(model.prezzoAgenteTotale),1200);
+            animateValue(document.getElementById(`priceClient${model.nome}`),0,Math.round(model.prezzoClienteTotale),1200);
+            animateValue(document.getElementById(`marginAgent${model.nome}`),0,Math.round(model.margineAgente),1200);
+            animateValue(document.getElementById(`marginClient${model.nome}`),0,Math.round(model.margineCliente),1200);
+            animateValue(document.getElementById(`marginInst${model.nome}`),0,Math.round(model.margineInstallazione),1200);
+            animateValue(document.getElementById(`marginKm${model.nome}`),0,Math.round(model.margineKm),1200);
+          },50);
+        }
+      });
+
+      if(rotatedMatches.length>0){
+        alertContainer.innerHTML=`<div class="alert">⚠️ E' possibile ruotare alcuni cabinet verticali in maniera orizzantale per ottenere questa misura ma non è consigliato.</div>`;
+        aggiornaLayout(rotatedMatches,true);
+      }
+      else if(perfectMatches.length===0){
+        alertContainer.innerHTML = `
+          <div class="alert">
+            Per questa misura ti consigliamo un <strong>${bestMatch.nome}</strong>
+            con misure realizzabili ${bestMatch.displayWidth} × ${bestMatch.displayHeight} cm.<br>
+            Puoi richiedere un preventivo personalizzato cliccando
+            <a href="https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
+              `Ti contatto dal calcolatore ADMIN per un preventivo personalizzato con misura ${base} x ${altezza}${(bif? ' (Bifacciale)':'')}.`
+            )}" target="_blank">qui</a>.
+          </div>`;
+        aggiornaLayout([bestMatch],false);
+      }
+      else {
+        aggiornaLayout(perfectMatches,false);
+      }
+    }
+
+    baseInput.addEventListener('input', aggiornaCards);
+    altezzaInput.addEventListener('input', aggiornaCards);
+    bifaccialeInput.addEventListener('change', aggiornaCards);
+    installazioneSelect.addEventListener('change', aggiornaCards);
+    provinciaSelect.addEventListener('change', ()=>{
+      setProvinciaPill();
+      aggiornaCards();
+    });
+    setProvinciaPill();
+
+    // Effetto luce sui moduli
+    setInterval(()=>{
+      const cells=document.querySelectorAll('#layoutContainer > div > div');
+      cells.forEach((cell,i)=>{
+        const pulse=Math.sin(Date.now()/400+i)*0.4+0.6;
+        cell.style.filter=`brightness(${pulse})`;
+      });
+    },80);
+
+    // === TEMA (Minimal / Dark) ===
+    const THEME_KEY = 'seemax_admin_theme_style';
+    const themeButtons = document.querySelectorAll('.theme-toggle-btn');
+
+    function applyTheme(theme) {
+      const t = theme === 'dark' ? 'dark' : 'minimal';
+      document.body.classList.remove('theme-minimal','theme-dark');
+      document.body.classList.add('theme-' + t);
+      themeButtons.forEach(btn => {
+        btn.classList.toggle('theme-toggle-btn--active', btn.dataset.theme === t);
+      });
+      try { localStorage.setItem(THEME_KEY, t); } catch(e) {}
+    }
+
+    themeButtons.forEach(btn => {
+      btn.addEventListener('click', () => applyTheme(btn.dataset.theme));
+    });
+
+    (function initTheme(){
+      let saved = 'minimal';
+      try {
+        const stored = localStorage.getItem(THEME_KEY);
+        if(stored === 'dark' || stored === 'minimal') saved = stored;
+      } catch(e) {}
+      applyTheme(saved);
+    })();
+  </script>
 </body>
 </html>
